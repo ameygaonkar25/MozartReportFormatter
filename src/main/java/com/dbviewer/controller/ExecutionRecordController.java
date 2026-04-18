@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")   // Allow requests from any origin during local dev
+@CrossOrigin(origins = "*")
 public class ExecutionRecordController {
 
     private final ExecutionRecordService service;
@@ -23,7 +23,6 @@ public class ExecutionRecordController {
     // GET /api/records — all source records
     @GetMapping("/records")
     public ResponseEntity<List<ExecutionRecord>> getAllRecords() {
-        log.info("Fetching all execution records");
         return ResponseEntity.ok(service.getAllRecords());
     }
 
@@ -34,12 +33,11 @@ public class ExecutionRecordController {
     }
 
     // POST /api/placeholder — build placeholder table
-    // Body: { "date1": "12-Apr-26", "date2": "04-Apr-26", "date3": "02-Apr-26" }
+    // Body: { "recordId1": 33, "recordId2": 17, "recordId3": 1 }
     @PostMapping("/placeholder")
     public ResponseEntity<List<PlaceholderRow>> buildPlaceholder(
             @RequestBody PlaceholderRequest request) {
-        log.info("Building placeholder table: {}", request);
-        List<PlaceholderRow> rows = service.buildPlaceholderTable(request);
-        return ResponseEntity.ok(rows);
+        log.info("Building placeholder table with request: {}", request);
+        return ResponseEntity.ok(service.buildPlaceholderTable(request));
     }
 }

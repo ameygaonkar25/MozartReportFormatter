@@ -19,24 +19,25 @@ public class ExecutionRecordService {
 
     private final ExecutionRecordRepository repository;
 
-    // Static 16-row structure: Nodes x TotalTxn combinations
+    // Static 16-row structure: Nodes x TotalTxn combinations (position-aware)
+    // Row index matches the seeding order so position-based lookup works correctly
     private static final List<int[]> STATIC_ROWS = Arrays.asList(
-        new int[]{1,  10000},
-        new int[]{1,  100000},
-        new int[]{1,  500000},
-        new int[]{1,  100000},
-        new int[]{2,  10000},
-        new int[]{2,  100000},
-        new int[]{2,  500000},
-        new int[]{2,  100000},
-        new int[]{5,  10000},
-        new int[]{5,  100000},
-        new int[]{5,  500000},
-        new int[]{5,  100000},
-        new int[]{10, 10000},
-        new int[]{10, 100000},
-        new int[]{10, 500000},
-        new int[]{10, 100000}
+            new int[]{1,  10000,  0},   // index 0 within its date group
+            new int[]{1,  100000, 1},
+            new int[]{1,  500000, 2},
+            new int[]{1,  100000, 3},   // duplicate txn, different position
+            new int[]{2,  10000,  4},
+            new int[]{2,  100000, 5},
+            new int[]{2,  500000, 6},
+            new int[]{2,  100000, 7},
+            new int[]{5,  10000,  8},
+            new int[]{5,  100000, 9},
+            new int[]{5,  500000, 10},
+            new int[]{5,  100000, 11},
+            new int[]{10, 10000,  12},
+            new int[]{10, 100000, 13},
+            new int[]{10, 500000, 14},
+            new int[]{10, 100000, 15}
     );
 
     // ── Fetch all source records ──────────────────────────────────────────────
@@ -50,21 +51,30 @@ public class ExecutionRecordService {
     }
 
     // ── Build the 16-row placeholder table ───────────────────────────────────
+    // Uses record IDs to anchor the date, then finds sibling rows by position offset
     public List<PlaceholderRow> buildPlaceholderTable(PlaceholderRequest request) {
-        log.debug("Building placeholder table for dates: col1={}, col2={}, col3={}",
-                request.getDate1(), request.getDate2(), request.getDate3());
+        log.debug("Building placeholder table for recordIds: col1={}, col2={}, col3={}",
+                request.getRecordId1(), request.getRecordId2(), request.getRecordId3());
+
+        // Resolve anchor records (the ones the user selected)
+        ExecutionRecord anchor1 = resolveAnchor(request.getRecordId1());
+        ExecutionRecord anchor2 = resolveAnchor(request.getRecordId2());
+        ExecutionRecord anchor3 = resolveAnchor(request.getRecordId3());
+
+        // Fetch all records sorted by id so positional offset is stable
+        List<ExecutionRecord> allRecords = repository.findAllByOrderByIdAsc();
 
         List<PlaceholderRow> rows = new ArrayList<>();
 
         for (int[] combo : STATIC_ROWS) {
-            int nodes   = combo[0];
+            int nodes    = combo[0];
             int totalTxn = combo[1];
+            int position = combo[2];  // 0-based position within a date group (16 rows per date)
 
-            Double avg1 = lookupAvg(nodes, totalTxn, request.getDate1());
-            Double avg2 = lookupAvg(nodes, totalTxn, request.getDate2());
-            Double avg3 = lookupAvg(nodes, totalTxn, request.getDate3());
+            Double avg1 = lookupByAnchorAndPosition(allRecords, anchor1, position);
+            Double avg2 = lookupByAnchorAndPosition(allRecords, anchor2, position);
+            Double avg3 = lookupByAnchorAndPosition(allRecords, anchor3, position);
 
-            // Improvement = 2nd col avg - 1st col avg (in seconds)
             Double improvement = null;
             if (avg1 != null && avg2 != null) {
                 improvement = avg2 - avg1;
@@ -83,11 +93,29 @@ public class ExecutionRecordService {
         return rows;
     }
 
-    // ── Helper: safe lookup ───────────────────────────────────────────────────
-    private Double lookupAvg(int nodes, int totalTxn, String date) {
-        if (date == null || date.isBlank()) return null;
-        return repository
-                .findAvgTimeByNodesAndTxnAndDate(nodes, totalTxn, date)
-                .orElse(null);
+    // ── Resolve anchor record from ID ─────────────────────────────────────────
+    private ExecutionRecord resolveAnchor(Long recordId) {
+        if (recordId == null) return null;
+        return repository.findById(recordId).orElse(null);
+    }
+
+    // ── Find the avg time for a given position within the same date group ─────
+    // Strategy: find all records with the same executionDate as the anchor,
+    // ordered by id, then pick by position index (0-15).
+    private Double lookupByAnchorAndPosition(List<ExecutionRecord> allRecords,
+                                             ExecutionRecord anchor, int position) {
+        if (anchor == null) return null;
+
+        List<ExecutionRecord> sameDate = allRecords.stream()
+                .filter(r -> r.getExecutionDate().equals(anchor.getExecutionDate()))
+                .toList();
+
+        if (position >= sameDate.size()) {
+            log.warn("Position {} out of bounds for date group {} (size {})",
+                    position, anchor.getExecutionDate(), sameDate.size());
+            return null;
+        }
+
+        return sameDate.get(position).getAvgTime();
     }
 }

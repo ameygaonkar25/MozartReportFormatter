@@ -217,14 +217,14 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>#</th>
-            <th>Nodes</th>
-            <th>Total Txn</th>
-            <th>Execution Date</th>
-            <th>Avg Time (s)</th>
-            <th>Assignment</th>
-          </tr>
+        <tr>
+          <th>#</th>
+          <th>Nodes</th>
+          <th>Total Txn</th>
+          <th>Execution Date</th>
+          <th>Avg Time (s)</th>
+          <th>Assignment</th>
+        </tr>
         </thead>
         <tbody id="src-tbody"></tbody>
       </table>
@@ -237,14 +237,14 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>No of Jobs</th>
-            <th>Nodes</th>
-            <th>Date of 3rd col <span class="col-sub" id="lbl-col3">—</span></th>
-            <th>Date of 2nd col <span class="col-sub" id="lbl-col2">—</span></th>
-            <th>Date of 1st col <span class="col-sub" id="lbl-col1">—</span></th>
-            <th>Improvement (s) <span class="col-sub">2nd − 1st</span></th>
-          </tr>
+        <tr>
+          <th>No of Jobs</th>
+          <th>Nodes</th>
+          <th>Date of 3rd col <span class="col-sub" id="lbl-col3">—</span></th>
+          <th>Date of 2nd col <span class="col-sub" id="lbl-col2">—</span></th>
+          <th>Date of 1st col <span class="col-sub" id="lbl-col1">—</span></th>
+          <th>Improvement (s) <span class="col-sub">2nd − 1st</span></th>
+        </tr>
         </thead>
         <tbody id="ph-tbody"></tbody>
       </table>
@@ -366,12 +366,12 @@
   }
 
   async function fetchAndRenderPlaceholder() {
-    const dateFor = (col) => {
+    const idFor = (col) => {
       if (assignments[col] === null) return null;
-      return allRecords[assignments[col]].executionDate;
+      return allRecords[assignments[col]].id;   // send record ID, not date string
     };
 
-    const body = { date1: dateFor(1), date2: dateFor(2), date3: dateFor(3) };
+    const body = { recordId1: idFor(1), recordId2: idFor(2), recordId3: idFor(3) };
 
     try {
       const res = await fetch(`${API}/api/placeholder`, {

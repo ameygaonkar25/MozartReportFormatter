@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PlaceholderRequest {
-    private String date1;   // Date assigned to 1st column
-    private String date2;   // Date assigned to 2nd column
-    private String date3;   // Date assigned to 3rd column
+    private Long recordId1;   // ID of the record assigned to 1st column
+    private Long recordId2;   // ID of the record assigned to 2nd column
+    private Long recordId3;   // ID of the record assigned to 3rd column
 }
