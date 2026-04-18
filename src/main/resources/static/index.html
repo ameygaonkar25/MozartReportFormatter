@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DB Viewer — Placeholder Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary:     #ffffff;
+      --bg-secondary:   #f7f7f5;
+      --bg-tertiary:    #f0efec;
+      --text-primary:   #1a1a18;
+      --text-secondary: #6b6b68;
+      --text-tertiary:  #a0a09c;
+      --border-light:   rgba(0,0,0,0.08);
+      --border-medium:  rgba(0,0,0,0.14);
+      --border-strong:  rgba(0,0,0,0.22);
+      --blue-bg:        #E6F1FB;
+      --blue-text:      #0C447C;
+      --blue-border:    #378ADD;
+      --green-bg:       #EAF3DE;
+      --green-text:     #27500A;
+      --green-border:   #639922;
+      --amber-bg:       #FAEEDA;
+      --amber-text:     #633806;
+      --amber-border:   #BA7517;
+      --red-text:       #A32D2D;
+      --radius-sm:      6px;
+      --radius-md:      8px;
+      --radius-lg:      12px;
+      --font-sans:      'DM Sans', sans-serif;
+      --font-mono:      'DM Mono', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary:     #1c1c1a;
+        --bg-secondary:   #242422;
+        --bg-tertiary:    #2c2c2a;
+        --text-primary:   #f0efe8;
+        --text-secondary: #9a9a94;
+        --text-tertiary:  #66665e;
+        --border-light:   rgba(255,255,255,0.07);
+        --border-medium:  rgba(255,255,255,0.12);
+        --border-strong:  rgba(255,255,255,0.20);
+        --blue-bg:        #0C447C;
+        --blue-text:      #B5D4F4;
+        --blue-border:    #378ADD;
+        --green-bg:       #27500A;
+        --green-text:     #C0DD97;
+        --green-border:   #639922;
+        --amber-bg:       #633806;
+        --amber-text:     #FAC775;
+        --amber-border:   #BA7517;
+        --red-text:       #F09595;
+      }
+    }
+
+    html { font-size: 14px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .page-wrap { max-width: 1100px; margin: 0 auto; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .page-header { margin-bottom: 1.75rem; }
+    .page-header h1 {
+      font-size: 22px; font-weight: 500;
+      color: var(--text-primary); margin-bottom: 4px;
+    }
+    .page-header p { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── Card ───────────────────────────────────────────── */
+    .card {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-label {
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Tip ────────────────────────────────────────────── */
+    .tip { font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px; }
+
+    /* ── Controls ───────────────────────────────────────── */
+    .controls {
+      display: flex; flex-wrap: wrap;
+      gap: 8px; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .controls-label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
+
+    .assign-btn {
+      font-family: var(--font-sans); font-size: 12px; font-weight: 500;
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .assign-btn:hover { background: var(--bg-tertiary); }
+    .assign-btn.col1 { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
+    .assign-btn.col2 { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
+    .assign-btn.col3 { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
+
+    .clear-btn {
+      font-family: var(--font-sans); font-size: 12px;
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      margin-left: auto;
+      transition: background 0.12s;
+    }
+    .clear-btn:hover { background: var(--bg-secondary); }
+
+    /* ── Tables ─────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      font-weight: 500; font-size: 12px;
+      color: var(--text-secondary);
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 0.5px solid var(--border-medium);
+      white-space: nowrap;
+    }
+    td {
+      padding: 7px 10px;
+      border-bottom: 0.5px solid var(--border-light);
+      color: var(--text-primary);
+    }
+    tr:last-child td { border-bottom: none; }
+
+    /* source table rows */
+    .src-row { cursor: pointer; transition: background 0.1s; }
+    .src-row:hover td { background: var(--bg-secondary); }
+    .src-row.selected td {
+      background: var(--blue-bg);
+      color: var(--blue-text);
+    }
+
+    /* badges */
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 500;
+      padding: 2px 8px; border-radius: var(--radius-sm); margin-right: 3px;
+    }
+    .badge.col1 { background: var(--blue-bg);  color: var(--blue-text); }
+    .badge.col2 { background: var(--green-bg); color: var(--green-text); }
+    .badge.col3 { background: var(--amber-bg); color: var(--amber-text); }
+
+    .muted { color: var(--text-tertiary); }
+
+    /* improvement cell */
+    .impr-pos { color: var(--green-text); font-weight: 500; }
+    .impr-neg { color: var(--red-text);   font-weight: 500; }
+
+    /* placeholder col header sub-label */
+    .col-sub { font-family: var(--font-mono); font-size: 10px; font-weight: 400; color: var(--text-tertiary); display: block; margin-top: 1px; }
+
+    /* ── Loading / error states ─────────────────────────── */
+    .state-bar {
+      font-size: 12px; padding: 8px 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      display: none;
+    }
+    .state-bar.loading { background: var(--bg-secondary); color: var(--text-secondary); display: block; }
+    .state-bar.error   { background: #FCEBEB; color: #A32D2D; display: block; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header class="page-header">
+    <h1>DB Viewer — Placeholder Builder</h1>
+    <p>Select rows from the source table and assign them to date columns in the placeholder table.</p>
+  </header>
+
+  <!-- ── Source Table ─────────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">Source table — database data</div>
+    <p class="tip">Click a row to select it, then assign it to a date column below.</p>
+
+    <div class="controls">
+      <span class="controls-label">Assign selected row to:</span>
+      <button class="assign-btn" id="btn-col1" onclick="assignCol(1)">Date of 1st column</button>
+      <button class="assign-btn" id="btn-col2" onclick="assignCol(2)">Date of 2nd column</button>
+      <button class="assign-btn" id="btn-col3" onclick="assignCol(3)">Date of 3rd column</button>
+      <button class="clear-btn" onclick="clearAll()">Clear all</button>
+    </div>
+
+    <div id="src-state" class="state-bar loading">Loading records...</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nodes</th>
+            <th>Total Txn</th>
+            <th>Execution Date</th>
+            <th>Avg Time (s)</th>
+            <th>Assignment</th>
+          </tr>
+        </thead>
+        <tbody id="src-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Placeholder Table ────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">Placeholder table</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No of Jobs</th>
+            <th>Nodes</th>
+            <th>Date of 3rd col <span class="col-sub" id="lbl-col3">—</span></th>
+            <th>Date of 2nd col <span class="col-sub" id="lbl-col2">—</span></th>
+            <th>Date of 1st col <span class="col-sub" id="lbl-col1">—</span></th>
+            <th>Improvement (s) <span class="col-sub">2nd − 1st</span></th>
+          </tr>
+        </thead>
+        <tbody id="ph-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = '';   // empty = same origin; change to 'http://localhost:8080' if serving separately
+
+  let allRecords  = [];
+  let selectedIdx = null;
+  let assignments = { 1: null, 2: null, 3: null };
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  async function init() {
+    try {
+      const res = await fetch(`${API}/api/records`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      allRecords = await res.json();
+      document.getElementById('src-state').style.display = 'none';
+      renderSrcTable();
+      renderPhTableEmpty();
+    } catch (err) {
+      const bar = document.getElementById('src-state');
+      bar.className = 'state-bar error';
+      bar.textContent = `Failed to load records: ${err.message}`;
+    }
+  }
+
+  // ── Source table ──────────────────────────────────────────────────────────
+  function renderSrcTable() {
+    const tbody = document.getElementById('src-tbody');
+    tbody.innerHTML = '';
+    allRecords.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      tr.className = 'src-row' + (selectedIdx === i ? ' selected' : '');
+      tr.onclick = () => { selectedIdx = i; renderSrcTable(); };
+
+      let badge = '';
+      for (let c = 1; c <= 3; c++) {
+        if (assignments[c] === i)
+          badge += `<span class="badge col${c}">Col ${c}</span>`;
+      }
+
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${row.nodes}</td>
+        <td>${row.totalTxn.toLocaleString()}</td>
+        <td>${row.executionDate}</td>
+        <td>${row.avgTime}</td>
+        <td>${badge || '<span class="muted">—</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ── Assign a date column ──────────────────────────────────────────────────
+  function assignCol(col) {
+    if (selectedIdx === null) { alert('Please select a row first.'); return; }
+    assignments[col] = selectedIdx;
+    updateBtnStyles();
+    updateColLabels();
+    renderSrcTable();
+    fetchAndRenderPlaceholder();
+  }
+
+  function clearAll() {
+    assignments = { 1: null, 2: null, 3: null };
+    selectedIdx = null;
+    updateBtnStyles();
+    updateColLabels();
+    renderSrcTable();
+    renderPhTableEmpty();
+  }
+
+  function updateBtnStyles() {
+    for (let c = 1; c <= 3; c++) {
+      const btn = document.getElementById(`btn-col${c}`);
+      btn.className = assignments[c] !== null ? `assign-btn col${c}` : 'assign-btn';
+    }
+  }
+
+  function updateColLabels() {
+    for (let c = 1; c <= 3; c++) {
+      const el = document.getElementById(`lbl-col${c}`);
+      if (assignments[c] !== null) {
+        const r = allRecords[assignments[c]];
+        el.textContent = `${r.executionDate} · ${r.avgTime}s`;
+      } else {
+        el.textContent = '—';
+      }
+    }
+  }
+
+  // ── Placeholder table ─────────────────────────────────────────────────────
+  function renderPhTableEmpty() {
+    const tbody = document.getElementById('ph-tbody');
+    tbody.innerHTML = '';
+    const staticRows = [
+      [1,10000],[1,100000],[1,500000],[1,100000],
+      [2,10000],[2,100000],[2,500000],[2,100000],
+      [5,10000],[5,100000],[5,500000],[5,100000],
+      [10,10000],[10,100000],[10,500000],[10,100000]
+    ];
+    staticRows.forEach(([nodes, txn]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${txn.toLocaleString()}</td>
+        <td>${nodes}</td>
+        <td><span class="muted">—</span></td>
+        <td><span class="muted">—</span></td>
+        <td><span class="muted">—</span></td>
+        <td><span class="muted">—</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function fetchAndRenderPlaceholder() {
+    const dateFor = (col) => {
+      if (assignments[col] === null) return null;
+      return allRecords[assignments[col]].executionDate;
+    };
+
+    const body = { date1: dateFor(1), date2: dateFor(2), date3: dateFor(3) };
+
+    try {
+      const res = await fetch(`${API}/api/placeholder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      renderPhTable(rows);
+    } catch (err) {
+      console.error('Placeholder fetch failed:', err);
+    }
+  }
+
+  function renderPhTable(rows) {
+    const tbody = document.getElementById('ph-tbody');
+    tbody.innerHTML = '';
+    rows.forEach(row => {
+      const impr = row.improvement;
+      let imprCell = '<span class="muted">—</span>';
+      if (impr !== null && impr !== undefined) {
+        const cls = impr > 0 ? 'impr-pos' : (impr < 0 ? 'impr-neg' : '');
+        imprCell = `<span class="${cls}">${impr > 0 ? '+' : ''}${impr}s</span>`;
+      }
+      const fmt = v => v !== null && v !== undefined ? `${v}s` : '<span class="muted">—</span>';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.noOfJobs.toLocaleString()}</td>
+        <td>${row.nodes}</td>
+        <td>${fmt(row.dateOf3rdCol)}</td>
+        <td>${fmt(row.dateOf2ndCol)}</td>
+        <td>${fmt(row.dateOf1stCol)}</td>
+        <td>${imprCell}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
