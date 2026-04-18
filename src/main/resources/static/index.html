@@ -7,10 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --bg-primary:     #ffffff;
       --bg-secondary:   #f7f7f5;
@@ -20,197 +18,147 @@
       --text-tertiary:  #a0a09c;
       --border-light:   rgba(0,0,0,0.08);
       --border-medium:  rgba(0,0,0,0.14);
-      --border-strong:  rgba(0,0,0,0.22);
-      --blue-bg:        #E6F1FB;
-      --blue-text:      #0C447C;
-      --blue-border:    #378ADD;
-      --green-bg:       #EAF3DE;
-      --green-text:     #27500A;
-      --green-border:   #639922;
-      --amber-bg:       #FAEEDA;
-      --amber-text:     #633806;
-      --amber-border:   #BA7517;
+      --blue-bg:        #E6F1FB; --blue-text: #0C447C; --blue-border: #378ADD;
+      --green-bg:       #EAF3DE; --green-text: #27500A; --green-border: #639922;
+      --amber-bg:       #FAEEDA; --amber-text: #633806; --amber-border: #BA7517;
       --red-text:       #A32D2D;
-      --radius-sm:      6px;
-      --radius-md:      8px;
-      --radius-lg:      12px;
-      --font-sans:      'DM Sans', sans-serif;
-      --font-mono:      'DM Mono', monospace;
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --font-sans: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg-primary:     #1c1c1a;
-        --bg-secondary:   #242422;
-        --bg-tertiary:    #2c2c2a;
-        --text-primary:   #f0efe8;
-        --text-secondary: #9a9a94;
-        --text-tertiary:  #66665e;
-        --border-light:   rgba(255,255,255,0.07);
-        --border-medium:  rgba(255,255,255,0.12);
-        --border-strong:  rgba(255,255,255,0.20);
-        --blue-bg:        #0C447C;
-        --blue-text:      #B5D4F4;
-        --blue-border:    #378ADD;
-        --green-bg:       #27500A;
-        --green-text:     #C0DD97;
-        --green-border:   #639922;
-        --amber-bg:       #633806;
-        --amber-text:     #FAC775;
-        --amber-border:   #BA7517;
-        --red-text:       #F09595;
+        --bg-primary: #1c1c1a; --bg-secondary: #242422; --bg-tertiary: #2c2c2a;
+        --text-primary: #f0efe8; --text-secondary: #9a9a94; --text-tertiary: #66665e;
+        --border-light: rgba(255,255,255,0.07); --border-medium: rgba(255,255,255,0.12);
+        --blue-bg: #0C447C; --blue-text: #B5D4F4;
+        --green-bg: #27500A; --green-text: #C0DD97;
+        --amber-bg: #633806; --amber-text: #FAC775;
+        --red-text: #F09595;
       }
     }
-
     html { font-size: 14px; }
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 2rem 1rem 4rem;
-    }
-
+    body { font-family: var(--font-sans); background: var(--bg-tertiary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; padding: 2rem 1rem 4rem; }
     .page-wrap { max-width: 1100px; margin: 0 auto; }
-
-    /* ── Header ─────────────────────────────────────────── */
     .page-header { margin-bottom: 1.75rem; }
-    .page-header h1 {
-      font-size: 22px; font-weight: 500;
-      color: var(--text-primary); margin-bottom: 4px;
-    }
+    .page-header h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
     .page-header p { font-size: 13px; color: var(--text-secondary); }
-
-    /* ── Card ───────────────────────────────────────────── */
-    .card {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-    .card-label {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 1rem;
-    }
-
-    /* ── Tip ────────────────────────────────────────────── */
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .card-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
     .tip { font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px; }
 
-    /* ── Controls ───────────────────────────────────────── */
-    .controls {
-      display: flex; flex-wrap: wrap;
-      gap: 8px; align-items: center;
-      margin-bottom: 1rem;
+    /* ── Filter bar ── */
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: var(--bg-secondary); border: 0.5px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 14px; }
+    .filter-bar label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+    .filter-bar select, .filter-bar input[type="text"] {
+      font-family: var(--font-sans); font-size: 12px; padding: 4px 8px;
+      border-radius: var(--radius-sm); border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary); color: var(--text-primary); height: 30px;
     }
-    .controls-label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
-
-    .assign-btn {
+    .filter-bar select { min-width: 90px; }
+    .filter-bar input[type="text"] { width: 110px; font-family: var(--font-mono); }
+    .filter-sep { font-size: 12px; color: var(--text-tertiary); }
+    .filter-apply-btn {
       font-family: var(--font-sans); font-size: 12px; font-weight: 500;
-      padding: 5px 12px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-medium);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
+      padding: 4px 14px; height: 30px; border-radius: var(--radius-sm);
+      border: 0.5px solid var(--blue-border); background: var(--blue-bg);
+      color: var(--blue-text); cursor: pointer; transition: opacity 0.1s;
     }
+    .filter-apply-btn:hover { opacity: 0.85; }
+    .filter-clear-btn {
+      font-family: var(--font-sans); font-size: 12px; padding: 4px 10px; height: 30px;
+      border-radius: var(--radius-sm); border: 0.5px solid var(--border-medium);
+      background: transparent; color: var(--text-secondary); cursor: pointer;
+    }
+    .filter-clear-btn:hover { background: var(--bg-tertiary); }
+    #date2-wrap { display: none; align-items: center; gap: 8px; }
+    #date2-wrap.visible { display: flex; }
+    .record-count { font-size: 11px; color: var(--text-tertiary); margin-left: auto; }
+
+    /* ── Controls ── */
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 1rem; }
+    .controls-label { font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
+    .assign-btn { font-family: var(--font-sans); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border-medium); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; transition: background 0.12s; }
     .assign-btn:hover { background: var(--bg-tertiary); }
     .assign-btn.col1 { background: var(--blue-bg);  color: var(--blue-text);  border-color: var(--blue-border); }
     .assign-btn.col2 { background: var(--green-bg); color: var(--green-text); border-color: var(--green-border); }
     .assign-btn.col3 { background: var(--amber-bg); color: var(--amber-text); border-color: var(--amber-border); }
-
-    .clear-btn {
-      font-family: var(--font-sans); font-size: 12px;
-      padding: 5px 12px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-medium);
-      background: transparent;
-      color: var(--text-secondary);
-      cursor: pointer;
-      margin-left: auto;
-      transition: background 0.12s;
-    }
+    .clear-btn { font-family: var(--font-sans); font-size: 12px; padding: 5px 12px; border-radius: var(--radius-md); border: 0.5px solid var(--border-medium); background: transparent; color: var(--text-secondary); cursor: pointer; margin-left: auto; }
     .clear-btn:hover { background: var(--bg-secondary); }
 
-    /* ── Tables ─────────────────────────────────────────── */
+    /* ── Tables ── */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      font-weight: 500; font-size: 12px;
-      color: var(--text-secondary);
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 0.5px solid var(--border-medium);
-      white-space: nowrap;
-    }
-    td {
-      padding: 7px 10px;
-      border-bottom: 0.5px solid var(--border-light);
-      color: var(--text-primary);
-    }
+    th { font-weight: 500; font-size: 12px; color: var(--text-secondary); text-align: left; padding: 8px 10px; border-bottom: 0.5px solid var(--border-medium); white-space: nowrap; }
+    td { padding: 7px 10px; border-bottom: 0.5px solid var(--border-light); color: var(--text-primary); }
     tr:last-child td { border-bottom: none; }
-
-    /* source table rows */
     .src-row { cursor: pointer; transition: background 0.1s; }
     .src-row:hover td { background: var(--bg-secondary); }
-    .src-row.selected td {
-      background: var(--blue-bg);
-      color: var(--blue-text);
-    }
+    .src-row.selected td { background: var(--blue-bg); color: var(--blue-text); }
 
-    /* badges */
-    .badge {
-      display: inline-block; font-size: 11px; font-weight: 500;
-      padding: 2px 8px; border-radius: var(--radius-sm); margin-right: 3px;
+    /* rowspan cell in placeholder table */
+    td.group-cell {
+      background: var(--bg-secondary);
+      font-weight: 500; font-size: 12px;
+      text-align: center;
+      vertical-align: middle;
+      border-right: 0.5px solid var(--border-medium);
+      border-bottom: 2px solid var(--border-medium);
+      color: var(--text-secondary);
+      white-space: nowrap;
     }
+    tr.group-last td { border-bottom: 2px solid var(--border-medium); }
+
+    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-sm); margin-right: 3px; }
     .badge.col1 { background: var(--blue-bg);  color: var(--blue-text); }
     .badge.col2 { background: var(--green-bg); color: var(--green-text); }
     .badge.col3 { background: var(--amber-bg); color: var(--amber-text); }
-
     .muted { color: var(--text-tertiary); }
-
-    /* improvement cell */
     .impr-pos { color: var(--green-text); font-weight: 500; }
     .impr-neg { color: var(--red-text);   font-weight: 500; }
-
-    /* placeholder col header sub-label */
     .col-sub { font-family: var(--font-mono); font-size: 10px; font-weight: 400; color: var(--text-tertiary); display: block; margin-top: 1px; }
-
-    /* ── Loading / error states ─────────────────────────── */
-    .state-bar {
-      font-size: 12px; padding: 8px 12px;
-      border-radius: var(--radius-md);
-      margin-bottom: 12px;
-      display: none;
-    }
+    .state-bar { font-size: 12px; padding: 8px 12px; border-radius: var(--radius-md); margin-bottom: 12px; display: none; }
     .state-bar.loading { background: var(--bg-secondary); color: var(--text-secondary); display: block; }
     .state-bar.error   { background: #FCEBEB; color: #A32D2D; display: block; }
   </style>
 </head>
 <body>
 <div class="page-wrap">
-
   <header class="page-header">
     <h1>DB Viewer — Placeholder Builder</h1>
-    <p>Select rows from the source table and assign them to date columns in the placeholder table.</p>
+    <p>Filter and select rows from the source table, then assign them to date columns in the placeholder table.</p>
   </header>
 
-  <!-- ── Source Table ─────────────────────────────────── -->
+  <!-- ── Source Table ── -->
   <div class="card">
     <div class="card-label">Source table — database data</div>
-    <p class="tip">Click a row to select it, then assign it to a date column below.</p>
 
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <label>Execution date</label>
+      <select id="filter-op" onchange="onOperatorChange()">
+        <option value="all">All</option>
+        <option value=">=">≥ (on or after)</option>
+        <option value="<=">≤ (on or before)</option>
+        <option value="between">Between</option>
+      </select>
+      <input type="text" id="filter-date1" placeholder="e.g. 02-Apr-26" />
+      <div id="date2-wrap">
+        <span class="filter-sep">and</span>
+        <input type="text" id="filter-date2" placeholder="e.g. 12-Apr-26" />
+      </div>
+      <button class="filter-apply-btn" onclick="applyFilter()">Apply</button>
+      <button class="filter-clear-btn" onclick="clearFilter()">Clear</button>
+      <span class="record-count" id="record-count"></span>
+    </div>
+
+    <p class="tip">Click a row to select it, then assign it to a date column below.</p>
     <div class="controls">
       <span class="controls-label">Assign selected row to:</span>
       <button class="assign-btn" id="btn-col1" onclick="assignCol(1)">Date of 1st column</button>
       <button class="assign-btn" id="btn-col2" onclick="assignCol(2)">Date of 2nd column</button>
       <button class="assign-btn" id="btn-col3" onclick="assignCol(3)">Date of 3rd column</button>
-      <button class="clear-btn" onclick="clearAll()">Clear all</button>
+      <button class="clear-btn" onclick="clearAssignments()">Clear assignments</button>
     </div>
 
     <div id="src-state" class="state-bar loading">Loading records...</div>
@@ -218,12 +166,7 @@
       <table>
         <thead>
         <tr>
-          <th>#</th>
-          <th>Nodes</th>
-          <th>Total Txn</th>
-          <th>Execution Date</th>
-          <th>Avg Time (s)</th>
-          <th>Assignment</th>
+          <th>#</th><th>Nodes</th><th>Total Txn</th><th>Execution Date</th><th>Avg Time (s)</th><th>Assignment</th>
         </tr>
         </thead>
         <tbody id="src-tbody"></tbody>
@@ -231,11 +174,11 @@
     </div>
   </div>
 
-  <!-- ── Placeholder Table ────────────────────────────── -->
+  <!-- ── Placeholder Table ── -->
   <div class="card">
     <div class="card-label">Placeholder table</div>
     <div class="table-wrap">
-      <table>
+      <table id="ph-table">
         <thead>
         <tr>
           <th>No of Jobs</th>
@@ -250,23 +193,33 @@
       </table>
     </div>
   </div>
-
 </div>
 
 <script>
-  const API = '';   // empty = same origin; change to 'http://localhost:8080' if serving separately
+  const API = '';
+  let allRecords   = [];   // full unfiltered list
+  let shownRecords = [];   // currently displayed (filtered or all)
+  let selectedIdx  = null; // index into shownRecords
+  let assignments  = { 1: null, 2: null, 3: null }; // maps col → record object
 
-  let allRecords  = [];
-  let selectedIdx = null;
-  let assignments = { 1: null, 2: null, 3: null };
+  // ── Groups for placeholder rowspan ──────────────────────────────────────────
+  // Each group: [noOfJobs label, count of rows] — must match STATIC_ROWS order in service
+  const PH_GROUPS = [
+    { label: '10,000',  size: 4 },
+    { label: '100,000', size: 4 },
+    { label: '500,000', size: 4 },
+    { label: '100,000', size: 4 },
+  ];
 
-  // ── Boot ──────────────────────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────────────────────────────────────
   async function init() {
     try {
       const res = await fetch(`${API}/api/records`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       allRecords = await res.json();
+      shownRecords = allRecords;
       document.getElementById('src-state').style.display = 'none';
+      updateRecordCount();
       renderSrcTable();
       renderPhTableEmpty();
     } catch (err) {
@@ -276,18 +229,67 @@
     }
   }
 
-  // ── Source table ──────────────────────────────────────────────────────────
+  // ── Filter ───────────────────────────────────────────────────────────────────
+  function onOperatorChange() {
+    const op = document.getElementById('filter-op').value;
+    document.getElementById('date2-wrap').className = op === 'between' ? 'visible' : '';
+  }
+
+  async function applyFilter() {
+    const op    = document.getElementById('filter-op').value;
+    const date1 = document.getElementById('filter-date1').value.trim();
+    const date2 = document.getElementById('filter-date2').value.trim();
+
+    if (op === 'all' || !date1) {
+      shownRecords = allRecords;
+      selectedIdx  = null;
+      updateRecordCount();
+      renderSrcTable();
+      return;
+    }
+
+    try {
+      let url = `${API}/api/records/filter?operator=${encodeURIComponent(op)}&date1=${encodeURIComponent(date1)}`;
+      if (op === 'between' && date2) url += `&date2=${encodeURIComponent(date2)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      shownRecords = await res.json();
+      selectedIdx  = null;
+      updateRecordCount();
+      renderSrcTable();
+    } catch (err) {
+      alert(`Filter failed: ${err.message}`);
+    }
+  }
+
+  function clearFilter() {
+    document.getElementById('filter-op').value  = 'all';
+    document.getElementById('filter-date1').value = '';
+    document.getElementById('filter-date2').value = '';
+    document.getElementById('date2-wrap').className = '';
+    shownRecords = allRecords;
+    selectedIdx  = null;
+    updateRecordCount();
+    renderSrcTable();
+  }
+
+  function updateRecordCount() {
+    document.getElementById('record-count').textContent =
+            `${shownRecords.length} record${shownRecords.length !== 1 ? 's' : ''}`;
+  }
+
+  // ── Source table ─────────────────────────────────────────────────────────────
   function renderSrcTable() {
     const tbody = document.getElementById('src-tbody');
     tbody.innerHTML = '';
-    allRecords.forEach((row, i) => {
+    shownRecords.forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.className = 'src-row' + (selectedIdx === i ? ' selected' : '');
       tr.onclick = () => { selectedIdx = i; renderSrcTable(); };
 
       let badge = '';
       for (let c = 1; c <= 3; c++) {
-        if (assignments[c] === i)
+        if (assignments[c] && assignments[c].id === row.id)
           badge += `<span class="badge col${c}">Col ${c}</span>`;
       }
 
@@ -297,23 +299,22 @@
         <td>${row.totalTxn.toLocaleString()}</td>
         <td>${row.executionDate}</td>
         <td>${row.avgTime}</td>
-        <td>${badge || '<span class="muted">—</span>'}</td>
-      `;
+        <td>${badge || '<span class="muted">—</span>'}</td>`;
       tbody.appendChild(tr);
     });
   }
 
-  // ── Assign a date column ──────────────────────────────────────────────────
+  // ── Assign columns ────────────────────────────────────────────────────────────
   function assignCol(col) {
     if (selectedIdx === null) { alert('Please select a row first.'); return; }
-    assignments[col] = selectedIdx;
+    assignments[col] = shownRecords[selectedIdx];
     updateBtnStyles();
     updateColLabels();
     renderSrcTable();
     fetchAndRenderPlaceholder();
   }
 
-  function clearAll() {
+  function clearAssignments() {
     assignments = { 1: null, 2: null, 3: null };
     selectedIdx = null;
     updateBtnStyles();
@@ -324,55 +325,44 @@
 
   function updateBtnStyles() {
     for (let c = 1; c <= 3; c++) {
-      const btn = document.getElementById(`btn-col${c}`);
-      btn.className = assignments[c] !== null ? `assign-btn col${c}` : 'assign-btn';
+      document.getElementById(`btn-col${c}`).className =
+              assignments[c] ? `assign-btn col${c}` : 'assign-btn';
     }
   }
 
   function updateColLabels() {
     for (let c = 1; c <= 3; c++) {
       const el = document.getElementById(`lbl-col${c}`);
-      if (assignments[c] !== null) {
-        const r = allRecords[assignments[c]];
-        el.textContent = `${r.executionDate} · ${r.avgTime}s`;
-      } else {
-        el.textContent = '—';
-      }
+      el.textContent = assignments[c]
+              ? `${assignments[c].executionDate} · ${assignments[c].avgTime}s`
+              : '—';
     }
   }
 
-  // ── Placeholder table ─────────────────────────────────────────────────────
+  // ── Placeholder table ─────────────────────────────────────────────────────────
   function renderPhTableEmpty() {
     const tbody = document.getElementById('ph-tbody');
     tbody.innerHTML = '';
-    const staticRows = [
-      [1,10000],[1,100000],[1,500000],[1,100000],
-      [2,10000],[2,100000],[2,500000],[2,100000],
-      [5,10000],[5,100000],[5,500000],[5,100000],
-      [10,10000],[10,100000],[10,500000],[10,100000]
-    ];
-    staticRows.forEach(([nodes, txn]) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${txn.toLocaleString()}</td>
-        <td>${nodes}</td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">—</span></td>
-        <td><span class="muted">—</span></td>
-      `;
-      tbody.appendChild(tr);
+    let rowNum = 0;
+    PH_GROUPS.forEach(group => {
+      for (let i = 0; i < group.size; i++) {
+        const tr = document.createElement('tr');
+        if (i === group.size - 1) tr.classList.add('group-last');
+        let cells = '';
+        if (i === 0) {
+          cells += `<td class="group-cell" rowspan="${group.size}">${group.label}</td>`;
+        }
+        cells += `<td><span class="muted">—</span></td>`.repeat(5);
+        tr.innerHTML = cells;
+        tbody.appendChild(tr);
+        rowNum++;
+      }
     });
   }
 
   async function fetchAndRenderPlaceholder() {
-    const idFor = (col) => {
-      if (assignments[col] === null) return null;
-      return allRecords[assignments[col]].id;   // send record ID, not date string
-    };
-
+    const idFor = col => assignments[col] ? assignments[col].id : null;
     const body = { recordId1: idFor(1), recordId2: idFor(2), recordId3: idFor(3) };
-
     try {
       const res = await fetch(`${API}/api/placeholder`, {
         method: 'POST',
@@ -380,8 +370,7 @@
         body: JSON.stringify(body)
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const rows = await res.json();
-      renderPhTable(rows);
+      renderPhTable(await res.json());
     } catch (err) {
       console.error('Placeholder fetch failed:', err);
     }
@@ -390,24 +379,35 @@
   function renderPhTable(rows) {
     const tbody = document.getElementById('ph-tbody');
     tbody.innerHTML = '';
-    rows.forEach(row => {
-      const impr = row.improvement;
-      let imprCell = '<span class="muted">—</span>';
-      if (impr !== null && impr !== undefined) {
-        const cls = impr > 0 ? 'impr-pos' : (impr < 0 ? 'impr-neg' : '');
-        imprCell = `<span class="${cls}">${impr > 0 ? '+' : ''}${impr}s</span>`;
+    const fmt = v => v !== null && v !== undefined ? `${v}s` : '<span class="muted">—</span>';
+
+    let rowIndex = 0;
+    PH_GROUPS.forEach(group => {
+      for (let i = 0; i < group.size; i++) {
+        const row = rows[rowIndex++];
+        const tr = document.createElement('tr');
+        if (i === group.size - 1) tr.classList.add('group-last');
+
+        const impr = row.improvement;
+        let imprCell = '<span class="muted">—</span>';
+        if (impr !== null && impr !== undefined) {
+          const cls = impr > 0 ? 'impr-pos' : (impr < 0 ? 'impr-neg' : '');
+          imprCell = `<span class="${cls}">${impr > 0 ? '+' : ''}${impr}s</span>`;
+        }
+
+        let cells = '';
+        if (i === 0) {
+          cells += `<td class="group-cell" rowspan="${group.size}">${group.label}</td>`;
+        }
+        cells += `
+          <td>${row.nodes}</td>
+          <td>${fmt(row.dateOf3rdCol)}</td>
+          <td>${fmt(row.dateOf2ndCol)}</td>
+          <td>${fmt(row.dateOf1stCol)}</td>
+          <td>${imprCell}</td>`;
+        tr.innerHTML = cells;
+        tbody.appendChild(tr);
       }
-      const fmt = v => v !== null && v !== undefined ? `${v}s` : '<span class="muted">—</span>';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.noOfJobs.toLocaleString()}</td>
-        <td>${row.nodes}</td>
-        <td>${fmt(row.dateOf3rdCol)}</td>
-        <td>${fmt(row.dateOf2ndCol)}</td>
-        <td>${fmt(row.dateOf1stCol)}</td>
-        <td>${imprCell}</td>
-      `;
-      tbody.appendChild(tr);
     });
   }
 

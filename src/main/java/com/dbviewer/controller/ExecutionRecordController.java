@@ -26,18 +26,28 @@ public class ExecutionRecordController {
         return ResponseEntity.ok(service.getAllRecords());
     }
 
-    // GET /api/dates — distinct execution dates
+    // GET /api/records/filter?operator=>=&date1=02-Apr-26
+    // GET /api/records/filter?operator=between&date1=02-Apr-26&date2=12-Apr-26
+    @GetMapping("/records/filter")
+    public ResponseEntity<List<ExecutionRecord>> getFilteredRecords(
+            @RequestParam String operator,
+            @RequestParam String date1,
+            @RequestParam(required = false) String date2) {
+        log.info("Filter request: operator={}, date1={}, date2={}", operator, date1, date2);
+        return ResponseEntity.ok(service.getFilteredRecords(operator, date1, date2));
+    }
+
+    // GET /api/dates — distinct execution dates (for filter dropdowns)
     @GetMapping("/dates")
     public ResponseEntity<List<String>> getAvailableDates() {
         return ResponseEntity.ok(service.getAvailableDates());
     }
 
     // POST /api/placeholder — build placeholder table
-    // Body: { "recordId1": 33, "recordId2": 17, "recordId3": 1 }
     @PostMapping("/placeholder")
     public ResponseEntity<List<PlaceholderRow>> buildPlaceholder(
             @RequestBody PlaceholderRequest request) {
-        log.info("Building placeholder table with request: {}", request);
+        log.info("Building placeholder table: {}", request);
         return ResponseEntity.ok(service.buildPlaceholderTable(request));
     }
 }
