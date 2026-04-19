@@ -98,10 +98,13 @@ public class ExecutionRecordService {
             int occIdx      = combo[2];
             String key      = nodes + "_" + totalTxn + "_" + occIdx;
 
-            String col1Val = formatAvg(map1.isEmpty() ? null : map1.get(key));
-            String col2Val = formatAvg(map2.isEmpty() ? null : map2.get(key));
-            String col3Val = formatAvg(map3.isEmpty() ? null : map3.get(key));
-            String improvement = calcImprovement(map2.get(key), map1.get(key), col2Val, col1Val);
+            // null map = column not assigned → "—"; missing key in map → "Not Run"
+            String col1Val = map1.isEmpty() ? "—" : formatAvg(map1.get(key));
+            String col2Val = map2.isEmpty() ? "—" : formatAvg(map2.get(key));
+            String col3Val = map3.isEmpty() ? "—" : formatAvg(map3.get(key));
+            Double raw1 = map1.isEmpty() ? null : map1.get(key);
+            Double raw2 = map2.isEmpty() ? null : map2.get(key);
+            String improvement = calcImprovement(raw2, raw1, col2Val, col1Val);
 
             rows.add(PlaceholderRow.builder()
                     .noOfJobs(totalTxn)
@@ -172,13 +175,16 @@ public class ExecutionRecordService {
      * Returns "—" if either column is unassigned.
      */
     private String calcImprovement(Double raw2, Double raw1, String col2Val, String col1Val) {
-        // If either column is not assigned at all
-        if (col1Val == null || col2Val == null) return "—";
-        // If either is Not Run
+        // Column not assigned at all
+        if ("—".equals(col1Val) || "—".equals(col2Val)) return "—";
+        // Row missing in DB for this date
         if (NOT_RUN.equals(col1Val) || NOT_RUN.equals(col2Val)) return NOT_RUN;
+        // Both values present — calculate diff
         if (raw1 == null || raw2 == null) return NOT_RUN;
         double diff = raw2 - raw1;
-        String sign = diff > 0 ? "+" : "";
-        return sign + (diff % 1 == 0 ? String.valueOf((int) diff) : String.valueOf(diff)) + "s";
+        int diffInt = (int) diff;   // avgTime is always whole seconds
+        if (diff > 0) return "+" + diffInt + "s";
+        if (diff < 0) return diffInt + "s";   // already has "-" from negative int
+        return "0s";
     }
 }
