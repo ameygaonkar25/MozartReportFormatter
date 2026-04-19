@@ -1,0 +1,2 @@
+Connecting to a real database (MySQL / Postgres)
+In application.properties, comment out the H2 block and uncomment the MySQL or PostgreSQL block, fill in your credentials, then add the matching driver dependency in pom.xml (the commented-out blocks are already there for you).

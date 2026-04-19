@@ -13,8 +13,10 @@ public class PlaceholderRow {
 
     private Integer noOfJobs;
     private Integer nodes;
-    private Double dateOf3rdCol;   // Avg time for 3rd column date
-    private Double dateOf2ndCol;   // Avg time for 2nd column date
-    private Double dateOf1stCol;   // Avg time for 1st column date
-    private Double improvement;    // 2nd col - 1st col (in seconds)
+
+    // These are now Strings so they can hold "Not Run" when data is missing
+    private String dateOf3rdCol;
+    private String dateOf2ndCol;
+    private String dateOf1stCol;
+    private String improvement;   // "Not Run", "—", or "+Xs" / "-Xs"
 }

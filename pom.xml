@@ -66,6 +66,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Security (needed to allow H2 console access) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
