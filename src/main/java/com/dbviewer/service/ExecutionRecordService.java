@@ -34,25 +34,25 @@ public class ExecutionRecordService {
      */
     private static final List<int[]> STATIC_ROWS = Arrays.asList(
             // noOfJobs = 10,000
-            new int[]{1,  10000,  0},
-            new int[]{2,  10000,  0},
-            new int[]{5,  10000,  0},
-            new int[]{10, 10000,  0},
-            // noOfJobs = 100,000 (1st occurrence)
-            new int[]{1,  100000, 0},
-            new int[]{2,  100000, 0},
-            new int[]{5,  100000, 0},
-            new int[]{10, 100000, 0},
+            new int[]{1,  10000,   0},
+            new int[]{2,  10000,   0},
+            new int[]{5,  10000,   0},
+            new int[]{10, 10000,   0},
+            // noOfJobs = 100,000
+            new int[]{1,  100000,  0},
+            new int[]{2,  100000,  0},
+            new int[]{5,  100000,  0},
+            new int[]{10, 100000,  0},
             // noOfJobs = 500,000
-            new int[]{1,  500000, 0},
-            new int[]{2,  500000, 0},
-            new int[]{5,  500000, 0},
-            new int[]{10, 500000, 0},
-            // noOfJobs = 100,000 (2nd occurrence)
-            new int[]{1,  100000, 1},
-            new int[]{2,  100000, 1},
-            new int[]{5,  100000, 1},
-            new int[]{10, 100000, 1}
+            new int[]{1,  500000,  0},
+            new int[]{2,  500000,  0},
+            new int[]{5,  500000,  0},
+            new int[]{10, 500000,  0},
+            // noOfJobs = 1,000,000
+            new int[]{1,  1000000, 0},
+            new int[]{2,  1000000, 0},
+            new int[]{5,  1000000, 0},
+            new int[]{10, 1000000, 0}
     );
 
     // ── Public methods ────────────────────────────────────────────────────────

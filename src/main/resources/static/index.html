@@ -218,7 +218,7 @@
     </select>
     <label>Total Txn</label>
     <select id="t-txn">
-      <option>10000</option><option>100000</option><option>500000</option>
+      <option>10000</option><option>100000</option><option>500000</option><option>1000000</option>
     </select>
     <label>Date</label>
     <input type="text" id="t-date" value="12-Apr-26" />
@@ -238,10 +238,10 @@
   // ── Groups for placeholder rowspan ──────────────────────────────────────────
   // Each group: [noOfJobs label, count of rows] — must match STATIC_ROWS order in service
   const PH_GROUPS = [
-    { label: '10,000',  size: 4 },
-    { label: '100,000', size: 4 },
-    { label: '500,000', size: 4 },
-    { label: '100,000', size: 4 },
+    { label: '10,000',    size: 4 },
+    { label: '100,000',   size: 4 },
+    { label: '500,000',   size: 4 },
+    { label: '1,000,000', size: 4 },
   ];
 
   // ── Init ─────────────────────────────────────────────────────────────────────
@@ -421,10 +421,11 @@
     };
 
     // Render improvement cell — may be "Not Run", "—", "+Xs", "-Xs"
+    // Positive improvement = green (2nd col faster), Negative = red (2nd col slower)
     const fmtImpr = v => {
       if (!v || v === '—') return '<span class="muted">—</span>';
       if (v === 'Not Run') return '<span class="not-run">Not Run</span>';
-      const cls = v.startsWith('+') ? 'impr-pos' : (v.startsWith('-') ? 'impr-neg' : '');
+      const cls = v.startsWith('-') ? 'impr-neg' : (v.startsWith('+') ? 'impr-pos' : '');
       return `<span class="${cls}">${v}</span>`;
     };
 
