@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Send Performance Report — Mozart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-primary:     #ffffff;
+      --bg-secondary:   #f7f7f5;
+      --bg-tertiary:    #f0efec;
+      --text-primary:   #1a1a18;
+      --text-secondary: #6b6b68;
+      --text-tertiary:  #a0a09c;
+      --border-light:   rgba(0,0,0,0.08);
+      --border-medium:  rgba(0,0,0,0.14);
+      --blue-bg:   #E6F1FB; --blue-text:   #0C447C; --blue-border:   #378ADD;
+      --green-bg:  #EAF3DE; --green-text:  #27500A; --green-border:  #639922;
+      --amber-bg:  #FAEEDA; --amber-text:  #633806; --amber-border:  #BA7517;
+      --red-text:  #A32D2D; --red-bg:      #FCEBEB;
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --font-sans: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1c1c1a; --bg-secondary: #242422; --bg-tertiary: #2c2c2a;
+        --text-primary: #f0efe8; --text-secondary: #9a9a94; --text-tertiary: #66665e;
+        --border-light: rgba(255,255,255,0.07); --border-medium: rgba(255,255,255,0.12);
+        --blue-bg: #0C447C; --blue-text: #B5D4F4;
+        --green-bg: #27500A; --green-text: #C0DD97;
+        --amber-bg: #633806; --amber-text: #FAC775;
+        --red-text: #F09595; --red-bg: #3a1a1a;
+      }
+    }
+    html { font-size: 14px; }
+    body { font-family: var(--font-sans); background: var(--bg-tertiary); color: var(--text-primary); min-height: 100vh; padding: 2rem 1rem 4rem; }
+    .page-wrap { max-width: 780px; margin: 0 auto; }
+
+    /* ── Nav back link ── */
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); text-decoration: none; margin-bottom: 1.5rem; }
+    .back-link:hover { color: var(--text-primary); }
+    .back-link svg { width: 14px; height: 14px; }
+
+    /* ── Page header ── */
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+    .page-header p { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── Card ── */
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .card-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 1rem; }
+    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
+    .field input[type="text"] {
+      width: 100%; font-family: var(--font-sans); font-size: 13px;
+      padding: 8px 10px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary); color: var(--text-primary);
+    }
+    .field input[type="text"]:focus { outline: none; border-color: var(--blue-border); }
+    .field .hint { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* ── Email tags input ── */
+    .tags-wrap {
+      min-height: 42px; padding: 6px 8px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium); background: var(--bg-primary);
+      display: flex; flex-wrap: wrap; gap: 5px; align-items: center; cursor: text;
+    }
+    .tags-wrap:focus-within { border-color: var(--blue-border); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--blue-bg); color: var(--blue-text);
+      font-size: 12px; padding: 3px 8px; border-radius: 20px;
+    }
+    .tag-remove { cursor: pointer; font-size: 14px; line-height: 1; opacity: 0.6; }
+    .tag-remove:hover { opacity: 1; }
+    .tag-input {
+      flex: 1; min-width: 180px; border: none; outline: none;
+      font-family: var(--font-mono); font-size: 12px;
+      background: transparent; color: var(--text-primary);
+      padding: 2px 4px;
+    }
+
+    /* ── Column assignment summary ── */
+    .col-summary { display: flex; flex-direction: column; gap: 8px; }
+    .col-row { display: flex; align-items: center; gap: 10px; }
+    .col-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; white-space: nowrap; min-width: 80px; text-align: center; }
+    .col-badge.col1 { background: var(--blue-bg);  color: var(--blue-text); }
+    .col-badge.col2 { background: var(--green-bg); color: var(--green-text); }
+    .col-badge.col3 { background: var(--amber-bg); color: var(--amber-text); }
+    .col-val { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); }
+    .col-none { font-size: 12px; color: var(--text-tertiary); font-style: italic; }
+    .col-label-input {
+      margin-left: auto; font-family: var(--font-sans); font-size: 12px;
+      padding: 4px 8px; border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-secondary); color: var(--text-primary);
+      width: 200px;
+    }
+    .col-label-input::placeholder { color: var(--text-tertiary); }
+    .col-label-input:focus { outline: none; border-color: var(--blue-border); }
+    .not-assigned-msg { font-size: 12px; color: var(--text-tertiary); padding: 8px 0; }
+
+    /* ── Config table inputs ── */
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .config-grid { grid-template-columns: 1fr; } }
+    .config-field { display: flex; flex-direction: column; gap: 5px; }
+    .config-field label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+    .config-field input {
+      font-family: var(--font-mono); font-size: 13px;
+      padding: 8px 10px; border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: var(--bg-primary); color: var(--text-primary);
+    }
+    .config-field input:focus { outline: none; border-color: var(--blue-border); }
+
+    /* config preview mini table */
+    table.cfg { border-collapse: collapse; font-size: 12px; min-width: 300px; }
+    table.cfg td { padding: 7px 12px; border: 1px solid #e0dfd8; }
+    table.cfg td.cfg-key { background: #f7f7f5; font-weight: 500; color: #6b6b68; width: 140px; }
+    table.cfg td.cfg-val { color: #1a1a18; }
+
+    /* ── Preview box ── */
+    .preview-wrap { border: 0.5px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden; }
+    .preview-bar { background: var(--bg-secondary); padding: 8px 12px; font-size: 11px; color: var(--text-secondary); font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+    .preview-bar button { font-family: var(--font-sans); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-medium); background: transparent; color: var(--text-secondary); cursor: pointer; }
+    .preview-bar button:hover { background: var(--bg-tertiary); }
+    iframe#preview-frame { width: 100%; height: 520px; border: none; display: block; background: #fff; }
+
+    /* ── Send button ── */
+    .send-btn {
+      width: 100%; font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+      padding: 12px; border-radius: var(--radius-md);
+      border: none; background: #1a1a18; color: #ffffff;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .send-btn:hover { opacity: 0.85; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Status banner ── */
+    .status-banner { font-size: 13px; padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 1rem; display: none; }
+    .status-banner.success { background: var(--green-bg); color: var(--green-text); display: block; }
+    .status-banner.error   { background: var(--red-bg);   color: var(--red-text);   display: block; }
+
+    /* ── Placeholder table preview ── */
+    table.ph { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table.ph th { font-weight: 500; font-size: 11px; color: #6b6b68; text-align: left; padding: 7px 9px; border-bottom: 1px solid #e0dfd8; white-space: nowrap; }
+    table.ph td { padding: 7px 9px; border-bottom: 1px solid #eeede8; color: #1a1a18; }
+    table.ph tr:last-child td { border-bottom: none; }
+    table.ph td.group-cell { background: #f7f7f5; font-weight: 500; font-size: 11px; text-align: center; vertical-align: middle; border-right: 1px solid #e0dfd8; border-bottom: 2px solid #c8c7c0; color: #6b6b68; }
+    table.ph tr.group-last td { border-bottom: 2px solid #c8c7c0; }
+    .muted { color: #c0bfb8; }
+    .not-run { font-size: 10px; font-family: monospace; color: #a0a09c; background: #f0efec; padding: 2px 5px; border-radius: 3px; }
+    .impr-pos { color: #27500A; font-weight: 500; }
+    .impr-neg { color: #A32D2D; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <a class="back-link" href="/">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M10 3L5 8l5 5"/>
+    </svg>
+    Back to DB Viewer
+  </a>
+
+  <div class="page-header">
+    <h1>Send Performance Report</h1>
+    <p>Email the Mozart placeholder table as a formatted HTML report to one or more recipients.</p>
+  </div>
+
+  <div id="status-banner" class="status-banner"></div>
+
+  <!-- ── Recipients ── -->
+  <div class="card">
+    <div class="card-label">Recipients</div>
+    <div class="field">
+      <label>To — email addresses</label>
+      <div class="tags-wrap" id="tags-wrap" onclick="document.getElementById('tag-input').focus()">
+        <input class="tag-input" id="tag-input" type="text"
+               placeholder="Type email and press Enter or comma..."
+               onkeydown="handleTagKey(event)"
+               onblur="commitTag()" />
+      </div>
+      <p class="hint">Press Enter or comma after each address. Click the × to remove.</p>
+    </div>
+    <div class="field">
+      <label>Subject</label>
+      <input type="text" id="subject-input" value="Mozart Performance Result"
+             placeholder="Mozart Performance Result" />
+    </div>
+  </div>
+
+  <!-- ── Column assignments ── -->
+  <div class="card">
+    <div class="card-label">Column assignments</div>
+    <p class="hint" style="margin-bottom:12px;">Loaded from your selections on the main page. Add an optional label for each column.</p>
+    <div class="col-summary" id="col-summary">
+      <p class="not-assigned-msg">No columns assigned yet. Go back to the main page and assign date columns first.</p>
+    </div>
+  </div>
+
+  <!-- ── Configuration ── -->
+  <div class="card">
+    <div class="card-label">Configuration</div>
+    <p class="hint" style="margin-bottom:12px;">These values will appear as a configuration summary at the top of the email.</p>
+    <div class="config-grid">
+      <div class="config-field">
+        <label>Thread Pool Size</label>
+        <input type="text" id="cfg-thread" placeholder="e.g. 10" oninput="refreshPreview()" />
+      </div>
+      <div class="config-field">
+        <label>Job Time</label>
+        <input type="text" id="cfg-jobtime" placeholder="e.g. 30s" oninput="refreshPreview()" />
+      </div>
+      <div class="config-field">
+        <label>Sortable</label>
+        <input type="text" id="cfg-sortable" placeholder="e.g. Yes / No" oninput="refreshPreview()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Table preview ── -->
+  <div class="card">
+    <div class="card-label">Table preview</div>
+    <div class="preview-wrap">
+      <div class="preview-bar">
+        <span>Email preview — config + performance table</span>
+        <button onclick="refreshPreview()">Refresh</button>
+      </div>
+      <div id="preview-container" style="padding:16px;background:#fff;">
+        <p style="font-size:12px;color:#a0a09c;text-align:center;padding:32px 0;">
+          Assign columns on the main page, then come back here to preview.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Send ── -->
+  <button class="send-btn" id="send-btn" onclick="sendReport()">Send Report</button>
+
+</div>
+
+<script>
+  const API = '';
+
+  // ── State loaded from sessionStorage (set by main page) ──────────────────────
+  let assignments = { 1: null, 2: null, 3: null };  // { recordId, date, avgTime }
+  let emails = [];
+  let phRows = [];
+
+  const PH_GROUPS = [
+    { label: '10,000',    size: 4 },
+    { label: '100,000',   size: 4 },
+    { label: '500,000',   size: 4 },
+    { label: '1,000,000', size: 4 },
+  ];
+
+  // ── Load assignments from sessionStorage ─────────────────────────────────────
+  function loadAssignments() {
+    try {
+      const saved = sessionStorage.getItem('mozart_assignments');
+      if (saved) assignments = JSON.parse(saved);
+    } catch(e) {}
+    renderColSummary();
+    if (hasAnyAssignment()) fetchPreview();
+  }
+
+  function hasAnyAssignment() {
+    return assignments[1] || assignments[2] || assignments[3];
+  }
+
+  // ── Column summary ────────────────────────────────────────────────────────────
+  function renderColSummary() {
+    const container = document.getElementById('col-summary');
+    if (!hasAnyAssignment()) {
+      container.innerHTML = '<p class="not-assigned-msg">No columns assigned yet. Go back to the main page and assign date columns first.</p>';
+      return;
+    }
+    let html = '';
+    for (let c = 1; c <= 3; c++) {
+      const a = assignments[c];
+      const savedLabel = sessionStorage.getItem(`mozart_label${c}`) || '';
+      html += `<div class="col-row">
+        <span class="col-badge col${c}">Col ${c}</span>
+        ${a
+              ? `<span class="col-val">${a.executionDate} &nbsp;·&nbsp; ${a.avgTime}s</span>`
+              : `<span class="col-none">Not assigned</span>`}
+        <input class="col-label-input" id="label${c}"
+               value="${savedLabel}"
+               placeholder="Label (e.g. Baseline, After fix...)"
+               oninput="saveLabel(${c})" />
+      </div>`;
+    }
+    container.innerHTML = html;
+  }
+
+  function saveLabel(col) {
+    const val = document.getElementById(`label${col}`).value;
+    sessionStorage.setItem(`mozart_label${col}`, val);
+  }
+
+  // ── Preview ───────────────────────────────────────────────────────────────────
+  async function fetchPreview() {
+    if (!hasAnyAssignment()) return;
+    const body = {
+      recordId1: assignments[1]?.id || null,
+      recordId2: assignments[2]?.id || null,
+      recordId3: assignments[3]?.id || null,
+    };
+    try {
+      const res = await fetch(`${API}/api/placeholder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      phRows = await res.json();
+      renderPreviewTable();
+    } catch(e) {
+      console.error('Preview fetch failed', e);
+    }
+  }
+
+  function refreshPreview() { fetchPreview(); }
+
+  function renderPreviewTable() {
+    const container = document.getElementById('preview-container');
+    if (!phRows.length) {
+      container.innerHTML = '<p style="font-size:12px;color:#a0a09c;text-align:center;padding:32px 0;">No data.</p>';
+      return;
+    }
+
+    const label1 = (document.getElementById('label1')?.value) || '1st Column';
+    const label2 = (document.getElementById('label2')?.value) || '2nd Column';
+    const label3 = (document.getElementById('label3')?.value) || '3rd Column';
+
+    const fmt = v => {
+      if (!v || v === '—') return '<span class="muted">—</span>';
+      if (v === 'Not Run') return '<span class="not-run">Not Run</span>';
+      return v;
+    };
+    const fmtImpr = v => {
+      if (!v || v === '—') return '<span class="muted">—</span>';
+      if (v === 'Not Run') return '<span class="not-run">Not Run</span>';
+      const cls = v.startsWith('-') ? 'impr-neg' : (v.startsWith('+') ? 'impr-pos' : '');
+      return `<span class="${cls}">${v}</span>`;
+    };
+
+    let rows = '';
+    let rowIndex = 0;
+    PH_GROUPS.forEach(group => {
+      for (let i = 0; i < group.size; i++) {
+        const row = phRows[rowIndex++];
+        const isLast = i === group.size - 1;
+        rows += `<tr class="${isLast ? 'group-last' : ''}">`;
+        if (i === 0) rows += `<td class="group-cell" rowspan="${group.size}">${group.label}</td>`;
+        rows += `<td>${row.nodes}</td>
+          <td>${fmt(row.dateOf3rdCol)}</td>
+          <td>${fmt(row.dateOf2ndCol)}</td>
+          <td>${fmt(row.dateOf1stCol)}</td>
+          <td>${fmtImpr(row.improvement)}</td></tr>`;
+      }
+    });
+
+    const col3Badge = assignments[3]
+            ? `<span style="background:#FAEEDA;color:#633806;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;">3rd — ${label3}</span>`
+            : '';
+
+    // Config values
+    const thread   = document.getElementById('cfg-thread')?.value   || '—';
+    const jobtime  = document.getElementById('cfg-jobtime')?.value  || '—';
+    const sortable = document.getElementById('cfg-sortable')?.value || '—';
+
+    container.innerHTML = `
+      <!-- Config table preview -->
+      <p style="font-size:11px;font-weight:500;color:#6b6b68;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Configuration</p>
+      <table class="cfg" style="margin-bottom:20px;">
+        <tr><td class="cfg-key">Thread Pool Size</td><td class="cfg-val">${thread}</td></tr>
+        <tr><td class="cfg-key">Job Time</td><td class="cfg-val">${jobtime}</td></tr>
+        <tr><td class="cfg-key">Sortable</td><td class="cfg-val">${sortable}</td></tr>
+      </table>
+
+      <!-- Column legend -->
+      <div style="margin-bottom:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <span style="background:#E6F1FB;color:#0C447C;font-size:11px;padding:2px 8px;border-radius:10px;">1st — ${label1}</span>
+        <span style="background:#EAF3DE;color:#27500A;font-size:11px;padding:2px 8px;border-radius:10px;">2nd — ${label2}</span>
+        ${col3Badge}
+      </div>
+
+      <!-- Performance table preview -->
+      <p style="font-size:11px;font-weight:500;color:#6b6b68;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Performance Results</p>
+      <table class="ph">
+        <thead><tr>
+          <th>No of Jobs</th><th>Nodes</th>
+          <th>Date of 3rd col</th><th>Date of 2nd col</th><th>Date of 1st col</th>
+          <th>Improvement (2nd−1st)</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // ── Email tags ────────────────────────────────────────────────────────────────
+  function handleTagKey(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      commitTag();
+    } else if (e.key === 'Backspace' && e.target.value === '' && emails.length > 0) {
+      removeTag(emails.length - 1);
+    }
+  }
+
+  function commitTag() {
+    const input = document.getElementById('tag-input');
+    const val = input.value.replace(/,/g, '').trim();
+    if (!val) return;
+    if (!val.includes('@')) { input.style.color = 'var(--red-text)'; return; }
+    input.style.color = '';
+    if (!emails.includes(val)) {
+      emails.push(val);
+      renderTags();
+    }
+    input.value = '';
+  }
+
+  function removeTag(i) {
+    emails.splice(i, 1);
+    renderTags();
+  }
+
+  function renderTags() {
+    const wrap = document.getElementById('tags-wrap');
+    const input = document.getElementById('tag-input');
+    wrap.querySelectorAll('.tag').forEach(t => t.remove());
+    emails.forEach((email, i) => {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.innerHTML = `${email} <span class="tag-remove" onclick="removeTag(${i})">×</span>`;
+      wrap.insertBefore(tag, input);
+    });
+  }
+
+  // ── Send ──────────────────────────────────────────────────────────────────────
+  async function sendReport() {
+    commitTag();
+    const banner = document.getElementById('status-banner');
+    const btn = document.getElementById('send-btn');
+
+    if (emails.length === 0) {
+      showBanner('error', 'Please add at least one recipient email address.');
+      return;
+    }
+    if (!hasAnyAssignment()) {
+      showBanner('error', 'No columns assigned. Go back to the main page and assign date columns first.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const body = {
+      toEmails: emails,
+      subject: document.getElementById('subject-input').value.trim() || 'Mozart Performance Result',
+      recordId1: assignments[1]?.id || null,
+      recordId2: assignments[2]?.id || null,
+      recordId3: assignments[3]?.id || null,
+      label1: document.getElementById('label1')?.value || '',
+      label2: document.getElementById('label2')?.value || '',
+      label3: document.getElementById('label3')?.value || '',
+      threadPoolSize: document.getElementById('cfg-thread')?.value  || '',
+      jobTime:        document.getElementById('cfg-jobtime')?.value || '',
+      sortable:       document.getElementById('cfg-sortable')?.value || '',
+    };
+
+    try {
+      const res = await fetch(`${API}/api/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        showBanner('success', data.message);
+      } else {
+        showBanner('error', data.message);
+      }
+    } catch(e) {
+      showBanner('error', 'Network error: ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send Report';
+    }
+  }
+
+  function showBanner(type, msg) {
+    const banner = document.getElementById('status-banner');
+    banner.className = 'status-banner ' + type;
+    banner.textContent = msg;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────────────────
+  loadAssignments();
+</script>
+</body>
+</html>

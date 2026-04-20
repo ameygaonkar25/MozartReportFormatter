@@ -137,9 +137,21 @@
 </head>
 <body>
 <div class="page-wrap">
-  <header class="page-header">
-    <h1>DB Viewer — Placeholder Builder</h1>
-    <p>Filter and select rows from the source table, then assign them to date columns in the placeholder table.</p>
+  <header class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1>DB Viewer — Placeholder Builder</h1>
+      <p>Filter and select rows from the source table, then assign them to date columns in the placeholder table.</p>
+    </div>
+    <a href="/email.html" id="email-link" onclick="saveAssignmentsToSession(event)"
+       style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans);font-size:13px;font-weight:500;
+              padding:8px 16px;border-radius:var(--radius-md);border:0.5px solid var(--border-medium);
+              background:var(--bg-primary);color:var(--text-primary);text-decoration:none;white-space:nowrap;">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="3" width="14" height="10" rx="2"/>
+        <path d="M1 5l7 5 7-5"/>
+      </svg>
+      Send Report
+    </a>
   </header>
 
   <!-- ── Source Table ── -->
@@ -450,6 +462,16 @@
         tbody.appendChild(tr);
       }
     });
+  }
+
+  // ── Save assignments to sessionStorage for email page ───────────────────────
+  function saveAssignmentsToSession(e) {
+    // Store the full record object for each assignment so email page can read it
+    const toSave = {};
+    for (let c = 1; c <= 3; c++) {
+      toSave[c] = assignments[c] || null;
+    }
+    sessionStorage.setItem('mozart_assignments', JSON.stringify(toSave));
   }
 
   // ── Dev test helpers ────────────────────────────────────────────────────────

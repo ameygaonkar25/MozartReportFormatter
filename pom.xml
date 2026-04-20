@@ -66,6 +66,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Java Mail Sender — optional, only needed when app.mail.mock=false -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Spring Security (needed to allow H2 console access) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
