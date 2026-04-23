@@ -40,9 +40,9 @@ public class EmailService {
     // ── Send (or mock-send) performance report ────────────────────────────────
     public String sendPerformanceReport(EmailRequest request) throws Exception {
         PlaceholderRequest pr = new PlaceholderRequest();
-        pr.setRecordId1(request.getRecordId1());
-        pr.setRecordId2(request.getRecordId2());
-        pr.setRecordId3(request.getRecordId3());
+        pr.setDate1(request.getDate1());
+        pr.setDate2(request.getDate2());
+        pr.setDate3(request.getDate3());
         List<PlaceholderRow> rows = executionRecordService.buildPlaceholderTable(pr);
 
         String subject = (request.getSubject() != null && !request.getSubject().isBlank())
@@ -123,7 +123,7 @@ public class EmailService {
             }
         }
 
-        String col3Legend = req.getRecordId3() != null
+        String col3Legend = req.getDate3() != null && !req.getDate3().isBlank()
                 ? "<td><span style='display:inline-block;background:#FAEEDA;color:#633806;font-size:11px;" +
                   "font-weight:500;padding:3px 10px;border-radius:5px;'>3rd col — " + label3 + "</span></td>"
                 : "";

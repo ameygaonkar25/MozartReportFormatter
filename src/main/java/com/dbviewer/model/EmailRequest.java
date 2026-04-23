@@ -7,9 +7,9 @@ import java.util.List;
 public class EmailRequest {
     private List<String> toEmails;
     private String subject;
-    private Long recordId1;
-    private Long recordId2;
-    private Long recordId3;
+    private String date1;
+    private String date2;
+    private String date3;
     private String label1;
     private String label2;
     private String label3;
