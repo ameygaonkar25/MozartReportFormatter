@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -23,7 +24,7 @@ public class ExecutionRecordService {
     private static final String NOT_RUN = "Not Run";
 
     // Must match getExecutionDate() format in ExecutionRecord — "dd-MMM-yy"
-    private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("dd-MMM-yy");
+    private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
 
     private static final List<int[]> STATIC_ROWS = Arrays.asList(
             new int[]{1,  10000,   0},
@@ -121,7 +122,7 @@ public class ExecutionRecordService {
         }
 
         List<ExecutionRecord> dateGroup = repository.findByTestDateOrderByIdAsc(date);
-        log.debug("Found {} records for date {}", dateGroup.size(), dateStr);
+        log.info("Lookup date string='{}' parsed='{}'  found {} records", dateStr, date, dateGroup.size());
 
         Map<String, Double> result = new LinkedHashMap<>();
         Map<String, Integer> occCounter = new HashMap<>();
@@ -141,7 +142,7 @@ public class ExecutionRecordService {
     private LocalDate parseDate(String dateStr) {
         if (dateStr == null || dateStr.isBlank()) return null;
         try {
-            return LocalDate.parse(dateStr, DISPLAY_FMT);
+            return LocalDate.parse(dateStr.trim(), DISPLAY_FMT);
         } catch (DateTimeParseException e) {
             try {
                 return LocalDate.parse(dateStr); // try ISO format as fallback

@@ -410,15 +410,15 @@
   }
 
   async function fetchAndRenderPlaceholder() {
-    const idFor = function(col) {
+    const dateFor = function(col) {
       if (!assignments[col]) return null;
-      return assignments[col].id;
+      return assignments[col].executionDate;
     };
 
     const body = {
-      recordId1: idFor(1),
-      recordId2: idFor(2),
-      recordId3: idFor(3)
+      date1: dateFor(1),
+      date2: dateFor(2),
+      date3: dateFor(3)
     };
 
     console.log('Placeholder request:', JSON.stringify(body));

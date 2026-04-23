@@ -312,9 +312,9 @@
   async function fetchPreview() {
     if (!hasAnyAssignment()) return;
     const body = {
-      recordId1: assignments[1]?.id || null,
-      recordId2: assignments[2]?.id || null,
-      recordId3: assignments[3]?.id || null,
+      date1: assignments[1] ? assignments[1].executionDate : null,
+      date2: assignments[2] ? assignments[2].executionDate : null,
+      date3: assignments[3] ? assignments[3].executionDate : null,
     };
     try {
       const res = await fetch(`${API}/api/placeholder`, {
@@ -468,9 +468,9 @@
     const body = {
       toEmails: emails,
       subject: document.getElementById('subject-input').value.trim() || 'Mozart Performance Result',
-      recordId1: assignments[1]?.id || null,
-      recordId2: assignments[2]?.id || null,
-      recordId3: assignments[3]?.id || null,
+      date1: assignments[1] ? assignments[1].executionDate : null,
+      date2: assignments[2] ? assignments[2].executionDate : null,
+      date3: assignments[3] ? assignments[3].executionDate : null,
       label1: document.getElementById('label1')?.value || '',
       label2: document.getElementById('label2')?.value || '',
       label3: document.getElementById('label3')?.value || '',

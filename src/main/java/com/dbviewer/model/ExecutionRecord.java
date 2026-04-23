@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Entity
 @Table(name = "MOZART_UNSORTABLE_JOB_RESULT")   // ← your Oracle table name
@@ -37,7 +38,7 @@ public class ExecutionRecord {
     private Double avgTime;
 
     // Formatted date string used throughout the app — "04-Apr-26" style
-    private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("dd-MMM-yy");
+    private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("dd-MMM-yy", Locale.ENGLISH);
 
     public String getExecutionDate() {
         return testDate != null ? testDate.format(DISPLAY_FMT) : null;

@@ -20,34 +20,30 @@ public class ExecutionRecordController {
 
     private final ExecutionRecordService service;
 
-    // GET /api/records — all source records
     @GetMapping("/records")
     public ResponseEntity<List<ExecutionRecord>> getAllRecords() {
         return ResponseEntity.ok(service.getAllRecords());
     }
 
-    // GET /api/records/filter?operator=>=&date1=02-Apr-26
-    // GET /api/records/filter?operator=between&date1=02-Apr-26&date2=12-Apr-26
     @GetMapping("/records/filter")
     public ResponseEntity<List<ExecutionRecord>> getFilteredRecords(
             @RequestParam String operator,
             @RequestParam String date1,
             @RequestParam(required = false) String date2) {
-        log.info("Filter request: operator={}, date1={}, date2={}", operator, date1, date2);
         return ResponseEntity.ok(service.getFilteredRecords(operator, date1, date2));
     }
 
-    // GET /api/dates — distinct execution dates (for filter dropdowns)
     @GetMapping("/dates")
     public ResponseEntity<List<String>> getAvailableDates() {
         return ResponseEntity.ok(service.getAvailableDates());
     }
 
-    // POST /api/placeholder — build placeholder table
+    // POST /api/placeholder
+    // Body: { "date1": "12-Apr-26", "date2": "04-Apr-26", "date3": "02-Apr-26" }
     @PostMapping("/placeholder")
     public ResponseEntity<List<PlaceholderRow>> buildPlaceholder(
             @RequestBody PlaceholderRequest request) {
-        log.info("Building placeholder table: {}", request);
+        log.info("Placeholder request: {}", request);
         return ResponseEntity.ok(service.buildPlaceholderTable(request));
     }
 }

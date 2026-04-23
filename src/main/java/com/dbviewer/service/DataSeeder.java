@@ -1,4 +1,4 @@
-package com.dbviewer.builder;
+package com.dbviewer.service;
 
 import com.dbviewer.model.ExecutionRecord;
 import com.dbviewer.repository.ExecutionRecordRepository;
