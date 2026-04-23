@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,16 +20,10 @@ public class ExecutionRecordService {
     private static final String NOT_RUN = "Not Run";
 
     /**
-     * Static 16-row definition for the placeholder table.
-     *
+     * Static 16-row placeholder structure.
      * Each entry: { nodes, totalTxn, occurrenceIndex }
-     *
-     * occurrenceIndex handles the duplicate totalTxn=100000 case:
-     *   - 0 = first time this (nodes, totalTxn) pair appears in the date group
-     *   - 1 = second time (the duplicate row with different avgTime)
-     *
-     * Ordered by noOfJobs group for the rowspan UI:
-     *   10000 x4 → 100000(occ=0) x4 → 500000 x4 → 100000(occ=1) x4
+     * occurrenceIndex = 0 for all since Oracle table has unique (date+nodes+totalTxn)
+     * Grouped by noOfJobs for the rowspan UI.
      */
     private static final List<int[]> STATIC_ROWS = Arrays.asList(
             // noOfJobs = 10,000
@@ -55,14 +48,12 @@ public class ExecutionRecordService {
             new int[]{10, 1000000, 0}
     );
 
-    // ── Public methods ────────────────────────────────────────────────────────
-
     public List<ExecutionRecord> getAllRecords() {
         return repository.findAllByOrderByIdAsc();
     }
 
     public List<ExecutionRecord> getFilteredRecords(String operator, String date1, String date2) {
-        log.debug("Filtering records: operator={}, date1={}, date2={}", operator, date1, date2);
+        log.debug("Filtering: operator={}, date1={}, date2={}", operator, date1, date2);
         return switch (operator) {
             case ">=" -> repository.findByDateGreaterThanEqual(date1);
             case "<=" -> repository.findByDateLessThanEqual(date1);
@@ -75,33 +66,31 @@ public class ExecutionRecordService {
         return repository.findAllDistinctDates();
     }
 
-    // ── Placeholder table builder ─────────────────────────────────────────────
-
     public List<PlaceholderRow> buildPlaceholderTable(PlaceholderRequest request) {
-        log.debug("Building placeholder for recordIds: col1={}, col2={}, col3={}",
-                request.getRecordId1(), request.getRecordId2(), request.getRecordId3());
+        log.debug("Building placeholder for dates: col1={}, col2={}, col3={}",
+                request.getDate1(), request.getDate2(), request.getDate3());
 
         ExecutionRecord anchor1 = resolveAnchor(request.getRecordId1());
         ExecutionRecord anchor2 = resolveAnchor(request.getRecordId2());
         ExecutionRecord anchor3 = resolveAnchor(request.getRecordId3());
 
-        // Build lookup maps per date: key = "nodes_totalTxn_occurrenceIndex" → avgTime
-        Map<String, Double> map1 = buildLookupMap(anchor1);
-        Map<String, Double> map2 = buildLookupMap(anchor2);
-        Map<String, Double> map3 = buildLookupMap(anchor3);
+        // Build lookup maps per date: key="nodes_totalTxn_occIdx" → avgTime
+        Map<String, Double> map1 = buildLookupMap(anchor1 != null ? anchor1.getExecutionDate() : null);
+        Map<String, Double> map2 = buildLookupMap(anchor2 != null ? anchor2.getExecutionDate() : null);
+        Map<String, Double> map3 = buildLookupMap(anchor3 != null ? anchor3.getExecutionDate() : null);
 
         List<PlaceholderRow> rows = new ArrayList<>();
 
         for (int[] combo : STATIC_ROWS) {
-            int nodes       = combo[0];
-            int totalTxn    = combo[1];
-            int occIdx      = combo[2];
-            String key      = nodes + "_" + totalTxn + "_" + occIdx;
+            int nodes    = combo[0];
+            int totalTxn = combo[1];
+            int occIdx   = combo[2];
+            String key   = nodes + "_" + totalTxn + "_" + occIdx;
 
-            // null map = column not assigned → "—"; missing key in map → "Not Run"
             String col1Val = map1.isEmpty() ? "—" : formatAvg(map1.get(key));
             String col2Val = map2.isEmpty() ? "—" : formatAvg(map2.get(key));
             String col3Val = map3.isEmpty() ? "—" : formatAvg(map3.get(key));
+
             Double raw1 = map1.isEmpty() ? null : map1.get(key);
             Double raw2 = map2.isEmpty() ? null : map2.get(key);
             String improvement = calcImprovement(raw2, raw1, col2Val, col1Val);
@@ -122,69 +111,39 @@ public class ExecutionRecordService {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /**
-     * Builds a lookup map for the date group of the anchor record.
+     * Builds lookup map for a given date.
      * Key = "nodes_totalTxn_occurrenceIndex"
-     * Value = avgTime
-     *
-     * occurrenceIndex tracks how many times a (nodes, totalTxn) pair has been
-     * seen within the date group (in ID order), so duplicate rows are uniquely
-     * addressable even without a position index.
+     * Since Oracle table has unique (date+nodes+totalTxn), occIdx is always 0.
      */
-    private Map<String, Double> buildLookupMap(ExecutionRecord anchor) {
-        if (anchor == null) return Collections.emptyMap();
+    private Map<String, Double> buildLookupMap(String date) {
+        if (date == null || date.isBlank()) return Collections.emptyMap();
 
-        List<ExecutionRecord> dateGroup =
-                repository.findByExecutionDateOrderByIdAsc(anchor.getExecutionDate());
-
+        List<ExecutionRecord> dateGroup = repository.findByExecutionDateOrderByIdAsc(date);
         Map<String, Double> result = new LinkedHashMap<>();
-        // occurrence counter: how many times have we seen each (nodes, totalTxn) pair
-        Map<String, Integer> occurrenceCounter = new HashMap<>();
+        Map<String, Integer> occCounter = new HashMap<>();
 
         for (ExecutionRecord rec : dateGroup) {
             String baseKey = rec.getNodes() + "_" + rec.getTotalTxn();
-            int occ = occurrenceCounter.getOrDefault(baseKey, 0);
-            String fullKey = baseKey + "_" + occ;
-            result.put(fullKey, rec.getAvgTime());
-            occurrenceCounter.put(baseKey, occ + 1);
+            int occ = occCounter.getOrDefault(baseKey, 0);
+            result.put(baseKey + "_" + occ, rec.getAvgTime());
+            occCounter.put(baseKey, occ + 1);
         }
-
         return result;
     }
 
-    private ExecutionRecord resolveAnchor(Long recordId) {
-        if (recordId == null) return null;
-        return repository.findById(recordId).orElse(null);
-    }
-
-    /**
-     * Formats avgTime as a string.
-     * null means the row was missing from DB → "Not Run"
-     * A real value → "200.0s"
-     * Empty map (no column assigned) → "—"
-     */
     private String formatAvg(Double avg) {
         if (avg == null) return NOT_RUN;
-        return avg % 1 == 0
-                ? String.valueOf(avg.intValue()) + "s"
-                : avg + "s";
+        return avg % 1 == 0 ? avg.intValue() + "s" : avg + "s";
     }
 
-    /**
-     * Calculates improvement (col2 - col1).
-     * Returns "Not Run" if either column is missing.
-     * Returns "—" if either column is unassigned.
-     */
     private String calcImprovement(Double raw2, Double raw1, String col2Val, String col1Val) {
-        // Column not assigned at all
         if ("—".equals(col1Val) || "—".equals(col2Val)) return "—";
-        // Row missing in DB for this date
         if (NOT_RUN.equals(col1Val) || NOT_RUN.equals(col2Val)) return NOT_RUN;
-        // Both values present — calculate diff
         if (raw1 == null || raw2 == null) return NOT_RUN;
         double diff = raw2 - raw1;
-        int diffInt = (int) diff;   // avgTime is always whole seconds
+        int diffInt = (int) diff;
         if (diff > 0) return "+" + diffInt + "s";
-        if (diff < 0) return diffInt + "s";   // already has "-" from negative int
+        if (diff < 0) return diffInt + "s";
         return "0s";
     }
 }

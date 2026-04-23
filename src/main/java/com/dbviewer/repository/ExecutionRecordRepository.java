@@ -11,25 +11,25 @@ import java.util.List;
 @Repository
 public interface ExecutionRecordRepository extends JpaRepository<ExecutionRecord, Long> {
 
-    // All distinct execution dates sorted
-    @Query("SELECT DISTINCT e.executionDate FROM ExecutionRecord e ORDER BY e.executionDate")
+    // All distinct test dates sorted
+    @Query("SELECT DISTINCT e.executionDate FROM ExecutionRecord e ORDER BY e.executionDate ASC")
     List<String> findAllDistinctDates();
 
-    // All records sorted by ID (stable order for positional lookup)
+    // All records sorted by ID (stable order)
     List<ExecutionRecord> findAllByOrderByIdAsc();
 
-    // All records for a specific date, ordered by ID
+    // All records for a specific date ordered by ID
     List<ExecutionRecord> findByExecutionDateOrderByIdAsc(String executionDate);
 
-    // Filter: records where executionDate >= fromDate
+    // Filter: >= date
     @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate >= :fromDate ORDER BY e.id ASC")
     List<ExecutionRecord> findByDateGreaterThanEqual(@Param("fromDate") String fromDate);
 
-    // Filter: records where executionDate <= toDate
+    // Filter: <= date
     @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate <= :toDate ORDER BY e.id ASC")
     List<ExecutionRecord> findByDateLessThanEqual(@Param("toDate") String toDate);
 
-    // Filter: records where executionDate between fromDate and toDate (inclusive)
+    // Filter: between dates
     @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate >= :fromDate AND e.executionDate <= :toDate ORDER BY e.id ASC")
     List<ExecutionRecord> findByDateBetween(@Param("fromDate") String fromDate, @Param("toDate") String toDate);
 }

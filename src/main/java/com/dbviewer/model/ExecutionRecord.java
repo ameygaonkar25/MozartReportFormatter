@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "execution_records")
+@Table(name = "EXECUTION_RECORDS")   // ← your Oracle table name
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,18 +15,20 @@ import lombok.NoArgsConstructor;
 public class ExecutionRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "exec_rec_seq")
+    @SequenceGenerator(name = "exec_rec_seq", sequenceName = "EXECUTION_RECORDS_SEQ", allocationSize = 1)
+    @Column(name = "ID")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "NODES", nullable = false)
     private Integer nodes;
 
-    @Column(name = "total_txn", nullable = false)
+    @Column(name = "TOTAL_TXN", nullable = false)
     private Integer totalTxn;
 
-    @Column(name = "execution_date", nullable = false)
+    @Column(name = "TEST_DATE", nullable = false)
     private String executionDate;
 
-    @Column(name = "avg_time", nullable = false)
+    @Column(name = "AVERAGE_TIME", nullable = false)
     private Double avgTime;
 }

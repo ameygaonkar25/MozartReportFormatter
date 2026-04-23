@@ -1,10 +1,11 @@
-package com.dbviewer.service;
+package com.dbviewer.builder;
 
 import com.dbviewer.model.ExecutionRecord;
 import com.dbviewer.repository.ExecutionRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@Profile("dev")   // Only runs with H2 dev profile — disabled for Oracle/production
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
