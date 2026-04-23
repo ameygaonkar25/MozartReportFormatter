@@ -241,14 +241,14 @@
 </div>
 
 <script>
-  const API = '';
-  let allRecords   = [];   // full unfiltered list
-  let shownRecords = [];   // currently displayed (filtered or all)
-  let selectedIdx  = null; // index into shownRecords
-  let assignments  = { 1: null, 2: null, 3: null }; // maps col → record object
+  'use strict';
 
-  // ── Groups for placeholder rowspan ──────────────────────────────────────────
-  // Each group: [noOfJobs label, count of rows] — must match STATIC_ROWS order in service
+  const API = '';
+  let allRecords   = [];
+  let shownRecords = [];
+  let selectedIdx  = null;
+  let assignments  = { 1: null, 2: null, 3: null };
+
   const PH_GROUPS = [
     { label: '10,000',    size: 4 },
     { label: '100,000',   size: 4 },
@@ -256,28 +256,32 @@
     { label: '1,000,000', size: 4 },
   ];
 
-  // ── Init ─────────────────────────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────────────────────
   async function init() {
     try {
-      const res = await fetch(`${API}/api/records`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch(API + '/api/records');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       allRecords = await res.json();
       shownRecords = allRecords;
+      if (allRecords.length > 0) {
+        console.log('Sample record from API:', JSON.stringify(allRecords[0]));
+      }
       document.getElementById('src-state').style.display = 'none';
       updateRecordCount();
       renderSrcTable();
       renderPhTableEmpty();
     } catch (err) {
+      console.error('Init failed:', err);
       const bar = document.getElementById('src-state');
       bar.className = 'state-bar error';
-      bar.textContent = `Failed to load records: ${err.message}`;
+      bar.textContent = 'Failed to load records: ' + err.message;
     }
   }
 
-  // ── Filter ───────────────────────────────────────────────────────────────────
+  // ── Filter ────────────────────────────────────────────────────────────────────
   function onOperatorChange() {
     const op = document.getElementById('filter-op').value;
-    document.getElementById('date2-wrap').className = op === 'between' ? 'visible' : '';
+    document.getElementById('date2-wrap').className = (op === 'between') ? 'visible' : '';
   }
 
   async function applyFilter() {
@@ -294,21 +298,21 @@
     }
 
     try {
-      let url = `${API}/api/records/filter?operator=${encodeURIComponent(op)}&date1=${encodeURIComponent(date1)}`;
-      if (op === 'between' && date2) url += `&date2=${encodeURIComponent(date2)}`;
+      let url = API + '/api/records/filter?operator=' + encodeURIComponent(op) + '&date1=' + encodeURIComponent(date1);
+      if (op === 'between' && date2) url += '&date2=' + encodeURIComponent(date2);
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       shownRecords = await res.json();
       selectedIdx  = null;
       updateRecordCount();
       renderSrcTable();
     } catch (err) {
-      alert(`Filter failed: ${err.message}`);
+      alert('Filter failed: ' + err.message);
     }
   }
 
   function clearFilter() {
-    document.getElementById('filter-op').value  = 'all';
+    document.getElementById('filter-op').value    = 'all';
     document.getElementById('filter-date1').value = '';
     document.getElementById('filter-date2').value = '';
     document.getElementById('date2-wrap').className = '';
@@ -319,32 +323,33 @@
   }
 
   function updateRecordCount() {
-    document.getElementById('record-count').textContent =
-            `${shownRecords.length} record${shownRecords.length !== 1 ? 's' : ''}`;
+    const el = document.getElementById('record-count');
+    if (el) el.textContent = shownRecords.length + ' record' + (shownRecords.length !== 1 ? 's' : '');
   }
 
-  // ── Source table ─────────────────────────────────────────────────────────────
+  // ── Source table ──────────────────────────────────────────────────────────────
   function renderSrcTable() {
     const tbody = document.getElementById('src-tbody');
     tbody.innerHTML = '';
-    shownRecords.forEach((row, i) => {
+    shownRecords.forEach(function(row, i) {
       const tr = document.createElement('tr');
       tr.className = 'src-row' + (selectedIdx === i ? ' selected' : '');
-      tr.onclick = () => { selectedIdx = i; renderSrcTable(); };
+      tr.onclick = function() { selectedIdx = i; renderSrcTable(); };
 
       let badge = '';
       for (let c = 1; c <= 3; c++) {
-        if (assignments[c] && assignments[c].id === row.id)
-          badge += `<span class="badge col${c}">Col ${c}</span>`;
+        if (assignments[c] && assignments[c].id === row.id) {
+          badge += '<span class="badge col' + c + '">Col ' + c + '</span>';
+        }
       }
 
-      tr.innerHTML = `
-        <td>${i + 1}</td>
-        <td>${row.nodes}</td>
-        <td>${row.totalTxn.toLocaleString()}</td>
-        <td>${row.executionDate}</td>
-        <td>${row.avgTime}</td>
-        <td>${badge || '<span class="muted">—</span>'}</td>`;
+      tr.innerHTML =
+              '<td>' + (i + 1) + '</td>' +
+              '<td>' + row.nodes + '</td>' +
+              '<td>' + row.totalTxn.toLocaleString() + '</td>' +
+              '<td>' + row.executionDate + '</td>' +
+              '<td>' + row.avgTime + '</td>' +
+              '<td>' + (badge || '<span class="muted">—</span>') + '</td>';
       tbody.appendChild(tr);
     });
   }
@@ -353,6 +358,7 @@
   function assignCol(col) {
     if (selectedIdx === null) { alert('Please select a row first.'); return; }
     assignments[col] = shownRecords[selectedIdx];
+    console.log('Assigned col ' + col + ':', JSON.stringify(assignments[col]));
     updateBtnStyles();
     updateColLabels();
     renderSrcTable();
@@ -370,17 +376,19 @@
 
   function updateBtnStyles() {
     for (let c = 1; c <= 3; c++) {
-      document.getElementById(`btn-col${c}`).className =
-              assignments[c] ? `assign-btn col${c}` : 'assign-btn';
+      document.getElementById('btn-col' + c).className =
+              assignments[c] ? 'assign-btn col' + c : 'assign-btn';
     }
   }
 
   function updateColLabels() {
     for (let c = 1; c <= 3; c++) {
-      const el = document.getElementById(`lbl-col${c}`);
-      el.textContent = assignments[c]
-              ? `${assignments[c].executionDate} · ${assignments[c].avgTime}s`
-              : '—';
+      const el = document.getElementById('lbl-col' + c);
+      if (el) {
+        el.textContent = assignments[c]
+                ? (assignments[c].executionDate + ' · ' + assignments[c].avgTime + 's')
+                : '—';
+      }
     }
   }
 
@@ -388,34 +396,43 @@
   function renderPhTableEmpty() {
     const tbody = document.getElementById('ph-tbody');
     tbody.innerHTML = '';
-    let rowNum = 0;
-    PH_GROUPS.forEach(group => {
+    PH_GROUPS.forEach(function(group) {
       for (let i = 0; i < group.size; i++) {
         const tr = document.createElement('tr');
         if (i === group.size - 1) tr.classList.add('group-last');
         let cells = '';
-        if (i === 0) {
-          cells += `<td class="group-cell" rowspan="${group.size}">${group.label}</td>`;
-        }
-        cells += `<td><span class="muted">—</span></td>`.repeat(5);
+        if (i === 0) cells += '<td class="group-cell" rowspan="' + group.size + '">' + group.label + '</td>';
+        cells += '<td><span class="muted">—</span></td>'.repeat(5);
         tr.innerHTML = cells;
         tbody.appendChild(tr);
-        rowNum++;
       }
     });
   }
 
   async function fetchAndRenderPlaceholder() {
-    const idFor = col => assignments[col] ? assignments[col].id : null;
-    const body = { recordId1: idFor(1), recordId2: idFor(2), recordId3: idFor(3) };
+    const idFor = function(col) {
+      if (!assignments[col]) return null;
+      return assignments[col].id;
+    };
+
+    const body = {
+      recordId1: idFor(1),
+      recordId2: idFor(2),
+      recordId3: idFor(3)
+    };
+
+    console.log('Placeholder request:', JSON.stringify(body));
+
     try {
-      const res = await fetch(`${API}/api/placeholder`, {
+      const res = await fetch(API + '/api/placeholder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      renderPhTable(await res.json());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const rows = await res.json();
+      console.log('Placeholder response:', JSON.stringify(rows[0]));
+      renderPhTable(rows);
     } catch (err) {
       console.error('Placeholder fetch failed:', err);
     }
@@ -425,48 +442,41 @@
     const tbody = document.getElementById('ph-tbody');
     tbody.innerHTML = '';
 
-    // Render a data cell — values are already formatted strings from backend
-    const fmt = v => {
+    function fmt(v) {
       if (!v || v === '—') return '<span class="muted">—</span>';
       if (v === 'Not Run') return '<span class="not-run">Not Run</span>';
       return v;
-    };
+    }
 
-    // Render improvement cell — may be "Not Run", "—", "+Xs", "-Xs"
-    // Positive improvement = green (2nd col faster), Negative = red (2nd col slower)
-    const fmtImpr = v => {
+    function fmtImpr(v) {
       if (!v || v === '—') return '<span class="muted">—</span>';
       if (v === 'Not Run') return '<span class="not-run">Not Run</span>';
       const cls = v.startsWith('-') ? 'impr-neg' : (v.startsWith('+') ? 'impr-pos' : '');
-      return `<span class="${cls}">${v}</span>`;
-    };
+      return '<span class="' + cls + '">' + v + '</span>';
+    }
 
     let rowIndex = 0;
-    PH_GROUPS.forEach(group => {
+    PH_GROUPS.forEach(function(group) {
       for (let i = 0; i < group.size; i++) {
         const row = rows[rowIndex++];
         const tr = document.createElement('tr');
         if (i === group.size - 1) tr.classList.add('group-last');
-
         let cells = '';
-        if (i === 0) {
-          cells += `<td class="group-cell" rowspan="${group.size}">${group.label}</td>`;
-        }
-        cells += `
-          <td>${row.nodes}</td>
-          <td>${fmt(row.dateOf3rdCol)}</td>
-          <td>${fmt(row.dateOf2ndCol)}</td>
-          <td>${fmt(row.dateOf1stCol)}</td>
-          <td>${fmtImpr(row.improvement)}</td>`;
+        if (i === 0) cells += '<td class="group-cell" rowspan="' + group.size + '">' + group.label + '</td>';
+        cells +=
+                '<td>' + row.nodes + '</td>' +
+                '<td>' + fmt(row.dateOf3rdCol) + '</td>' +
+                '<td>' + fmt(row.dateOf2ndCol) + '</td>' +
+                '<td>' + fmt(row.dateOf1stCol) + '</td>' +
+                '<td>' + fmtImpr(row.improvement) + '</td>';
         tr.innerHTML = cells;
         tbody.appendChild(tr);
       }
     });
   }
 
-  // ── Save assignments to sessionStorage for email page ───────────────────────
+  // ── Session storage for email page ────────────────────────────────────────────
   function saveAssignmentsToSession(e) {
-    // Store the full record object for each assignment so email page can read it
     const toSave = {};
     for (let c = 1; c <= 3; c++) {
       toSave[c] = assignments[c] || null;
@@ -474,28 +484,26 @@
     sessionStorage.setItem('mozart_assignments', JSON.stringify(toSave));
   }
 
-  // ── Dev test helpers ────────────────────────────────────────────────────────
+  // ── Dev test helpers ──────────────────────────────────────────────────────────
   async function testDelete() {
-    const nodes  = document.getElementById('t-nodes').value;
+    const nodes    = document.getElementById('t-nodes').value;
     const totalTxn = document.getElementById('t-txn').value;
-    const date   = document.getElementById('t-date').value.trim();
-    const msg    = document.getElementById('test-msg');
+    const date     = document.getElementById('t-date').value.trim();
+    const msg      = document.getElementById('test-msg');
     if (!date) { msg.className = 'test-msg err'; msg.textContent = 'Enter a date first.'; return; }
     try {
       const res = await fetch(
-              `${API}/api/test/delete?nodes=${nodes}&totalTxn=${totalTxn}&date=${encodeURIComponent(date)}`,
+              API + '/api/test/delete?nodes=' + nodes + '&totalTxn=' + totalTxn + '&date=' + encodeURIComponent(date),
               { method: 'DELETE' }
       );
       const data = await res.json();
       msg.className = data.deleted > 0 ? 'test-msg' : 'test-msg err';
       msg.textContent = data.message;
-      // Refresh source table
-      const r2 = await fetch(`${API}/api/records`);
+      const r2 = await fetch(API + '/api/records');
       allRecords = await r2.json();
       shownRecords = allRecords;
       updateRecordCount();
       renderSrcTable();
-      // Refresh placeholder if columns already assigned
       if (assignments[1] || assignments[2] || assignments[3]) fetchAndRenderPlaceholder();
     } catch (err) {
       msg.className = 'test-msg err';
@@ -506,12 +514,12 @@
   async function testReset() {
     const msg = document.getElementById('test-msg');
     try {
-      const res = await fetch(`${API}/api/test/reset`, { method: 'POST' });
+      const res  = await fetch(API + '/api/test/reset', { method: 'POST' });
       const data = await res.json();
-      msg.className = 'test-msg';
+      msg.className   = 'test-msg';
       msg.textContent = data.message;
     } catch (err) {
-      msg.className = 'test-msg err';
+      msg.className   = 'test-msg err';
       msg.textContent = 'Error: ' + err.message;
     }
   }

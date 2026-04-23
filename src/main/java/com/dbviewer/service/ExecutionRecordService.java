@@ -67,8 +67,8 @@ public class ExecutionRecordService {
     }
 
     public List<PlaceholderRow> buildPlaceholderTable(PlaceholderRequest request) {
-        log.debug("Building placeholder for dates: col1={}, col2={}, col3={}",
-                request.getDate1(), request.getDate2(), request.getDate3());
+        log.debug("Building placeholder for recordIds: col1={}, col2={}, col3={}",
+                request.getRecordId1(), request.getRecordId2(), request.getRecordId3());
 
         ExecutionRecord anchor1 = resolveAnchor(request.getRecordId1());
         ExecutionRecord anchor2 = resolveAnchor(request.getRecordId2());
@@ -109,6 +109,11 @@ public class ExecutionRecordService {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private ExecutionRecord resolveAnchor(Long recordId) {
+        if (recordId == null) return null;
+        return repository.findById(recordId).orElse(null);
+    }
 
     /**
      * Builds lookup map for a given date.
