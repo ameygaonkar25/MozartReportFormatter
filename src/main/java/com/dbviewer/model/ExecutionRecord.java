@@ -6,8 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Entity
-@Table(name = "EXECUTION_RECORDS")   // ← your Oracle table name
+@Table(name = "MOZART_UNSORTABLE_JOB_RESULT")   // ← your Oracle table name
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,9 +29,17 @@ public class ExecutionRecord {
     @Column(name = "TOTAL_TXN", nullable = false)
     private Integer totalTxn;
 
+    // Map Oracle DATE column as LocalDate — avoids timestamp format issues
     @Column(name = "TEST_DATE", nullable = false)
-    private String executionDate;
+    private LocalDate testDate;
 
     @Column(name = "AVERAGE_TIME", nullable = false)
     private Double avgTime;
+
+    // Formatted date string used throughout the app — "04-Apr-26" style
+    private static final DateTimeFormatter DISPLAY_FMT = DateTimeFormatter.ofPattern("dd-MMM-yy");
+
+    public String getExecutionDate() {
+        return testDate != null ? testDate.format(DISPLAY_FMT) : null;
+    }
 }

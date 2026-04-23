@@ -6,30 +6,31 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface ExecutionRecordRepository extends JpaRepository<ExecutionRecord, Long> {
 
     // All distinct test dates sorted
-    @Query("SELECT DISTINCT e.executionDate FROM ExecutionRecord e ORDER BY e.executionDate ASC")
-    List<String> findAllDistinctDates();
+    @Query("SELECT DISTINCT e.testDate FROM ExecutionRecord e ORDER BY e.testDate ASC")
+    List<LocalDate> findAllDistinctDates();
 
-    // All records sorted by ID (stable order)
+    // All records ordered by ID
     List<ExecutionRecord> findAllByOrderByIdAsc();
 
-    // All records for a specific date ordered by ID
-    List<ExecutionRecord> findByExecutionDateOrderByIdAsc(String executionDate);
+    // Records for a specific date ordered by ID
+    List<ExecutionRecord> findByTestDateOrderByIdAsc(LocalDate date);
 
-    // Filter: >= date
-    @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate >= :fromDate ORDER BY e.id ASC")
-    List<ExecutionRecord> findByDateGreaterThanEqual(@Param("fromDate") String fromDate);
+    // Filter: on or after date
+    @Query("SELECT e FROM ExecutionRecord e WHERE e.testDate >= :fromDate ORDER BY e.id ASC")
+    List<ExecutionRecord> findByDateGreaterThanEqual(@Param("fromDate") LocalDate fromDate);
 
-    // Filter: <= date
-    @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate <= :toDate ORDER BY e.id ASC")
-    List<ExecutionRecord> findByDateLessThanEqual(@Param("toDate") String toDate);
+    // Filter: on or before date
+    @Query("SELECT e FROM ExecutionRecord e WHERE e.testDate <= :toDate ORDER BY e.id ASC")
+    List<ExecutionRecord> findByDateLessThanEqual(@Param("toDate") LocalDate toDate);
 
     // Filter: between dates
-    @Query("SELECT e FROM ExecutionRecord e WHERE e.executionDate >= :fromDate AND e.executionDate <= :toDate ORDER BY e.id ASC")
-    List<ExecutionRecord> findByDateBetween(@Param("fromDate") String fromDate, @Param("toDate") String toDate);
+    @Query("SELECT e FROM ExecutionRecord e WHERE e.testDate >= :fromDate AND e.testDate <= :toDate ORDER BY e.id ASC")
+    List<ExecutionRecord> findByDateBetween(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
 }
