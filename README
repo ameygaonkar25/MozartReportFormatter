@@ -1,2 +1,57 @@
 Connecting to a real database (MySQL / Postgres)
 In application.properties, comment out the H2 block and uncomment the MySQL or PostgreSQL block, fill in your credentials, then add the matching driver dependency in pom.xml (the commented-out blocks are already there for you).
+
+API Reference
+
+📋 ExecutionRecord APIs — /api
+1. Get all records
+bashcurl -X GET http://localhost:8080/api/records
+
+2. Get all distinct dates
+bashcurl -X GET http://localhost:8080/api/dates
+
+3. Filter records by date — on or after
+bashcurl -X GET "http://localhost:8080/api/records/filter?operator=>=&date1=04-Apr-26"
+
+4. Filter records by date — on or before
+bashcurl -X GET "http://localhost:8080/api/records/filter?operator=<=&date1=12-Apr-26"
+
+5. Filter records by date — between
+bashcurl -X GET "http://localhost:8080/api/records/filter?operator=between&date1=04-Apr-26&date2=12-Apr-26"
+
+6. Build placeholder table
+bashcurl -X POST http://localhost:8080/api/placeholder \
+  -H "Content-Type: application/json" \
+  -d '{
+    "date1": "12-Apr-26",
+    "date2": "04-Apr-26",
+    "date3": "02-Apr-26"
+  }'
+
+📧 Email API — /api/email
+7. Send performance report email
+bashcurl -X POST http://localhost:8080/api/email/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "toEmails": ["user1@example.com", "user2@example.com"],
+    "subject": "Mozart Performance Result",
+    "date1": "12-Apr-26",
+    "date2": "04-Apr-26",
+    "date3": "02-Apr-26",
+    "label1": "Latest Run",
+    "label2": "Previous Run",
+    "label3": "Baseline",
+    "threadPoolSize": "10",
+    "jobTime": "30s",
+    "sortable": "Yes"
+  }'
+
+🧪 Test/Dev APIs — /api/test
+8. Get all records (raw)
+bashcurl -X GET http://localhost:8080/api/test/rows
+
+9. Delete a specific row (simulate missing data)
+bashcurl -X DELETE "http://localhost:8080/api/test/delete?nodes=5&totalTxn=10000&date=12-Apr-26"
+
+10. Reset — delete all records
+bashcurl -X POST http://localhost:8080/api/test/reset

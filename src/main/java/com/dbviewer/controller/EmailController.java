@@ -27,7 +27,7 @@ public class EmailController {
             return ResponseEntity.badRequest()
                     .body(Map.of("status", "error", "message", "At least one recipient email is required."));
         }
-        if (request.getRecordId1() == null && request.getRecordId2() == null && request.getRecordId3() == null) {
+        if (request.getDate1() == null && request.getDate2() == null && request.getDate3() == null) {
             return ResponseEntity.badRequest()
                     .body(Map.of("status", "error", "message", "At least one column must be assigned before sending."));
         }

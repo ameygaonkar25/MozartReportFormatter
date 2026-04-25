@@ -177,9 +177,9 @@ public class EmailService {
                       <tr style="background:#f7f7f5;">
                         <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;white-space:nowrap;">No of Jobs</th>
                         <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">Nodes</th>
-                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">Date of 3rd col</th>
-                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">Date of 2nd col</th>
-                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">Date of 1st col</th>
+                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">%s</th>
+                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">%s</th>
+                        <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">%s</th>
                         <th style="padding:9px 10px;text-align:left;border:1px solid #e0dfd8;color:#6b6b68;font-weight:500;">Improvement (2nd−1st)</th>
                       </tr>
                     </thead>
@@ -198,7 +198,9 @@ public class EmailService {
           </td></tr>
         </table>
         </body></html>
-        """.formatted(subject, sentAt, label1, label2, col3Legend, configTable, tableRows.toString());
+        """.formatted(subject, sentAt, label1, label2, col3Legend, configTable,
+                safe(req.getDate3(), "Date of 3rd col"), safe(req.getDate2(), "Date of 2nd col"), safe(req.getDate1(), "Date of 1st col"),
+                tableRows.toString());
     }
 
     private String td(String val, String extraStyle) {
